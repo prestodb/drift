@@ -15,9 +15,9 @@
  */
 package com.facebook.drift.transport.netty.server;
 
-import com.google.common.primitives.Ints;
 import com.facebook.drift.transport.netty.codec.Protocol;
 import com.facebook.drift.transport.netty.codec.Transport;
+import com.google.common.primitives.Ints;
 import io.airlift.units.DataSize;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

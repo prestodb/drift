@@ -15,10 +15,10 @@
  */
 package com.facebook.drift.transport.netty.server;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.facebook.drift.transport.netty.ssl.SslContextFactory;
 import com.facebook.drift.transport.server.ServerMethodInvoker;
 import com.facebook.drift.transport.server.ServerTransport;
+import com.google.common.annotations.VisibleForTesting;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
@@ -33,8 +33,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-import static io.airlift.concurrent.Threads.threadsNamed;
 import static com.facebook.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
+import static io.airlift.concurrent.Threads.threadsNamed;
 import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.SO_BACKLOG;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;

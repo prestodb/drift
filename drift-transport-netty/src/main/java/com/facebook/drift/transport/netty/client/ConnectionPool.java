@@ -15,10 +15,10 @@
  */
 package com.facebook.drift.transport.netty.client;
 
+import com.facebook.drift.protocol.TTransportException;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.net.HostAndPort;
-import com.facebook.drift.protocol.TTransportException;
 import io.airlift.units.Duration;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;

@@ -15,11 +15,11 @@
  */
 package com.facebook.drift.transport.netty.codec;
 
-import com.facebook.drift.transport.netty.ssl.TChannelBufferInputTransport;
 import com.facebook.drift.protocol.TMessage;
 import com.facebook.drift.protocol.TProtocolReader;
 import com.facebook.drift.protocol.TProtocolUtil;
 import com.facebook.drift.protocol.TType;
+import com.facebook.drift.transport.netty.ssl.TChannelBufferInputTransport;
 import io.airlift.units.DataSize;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

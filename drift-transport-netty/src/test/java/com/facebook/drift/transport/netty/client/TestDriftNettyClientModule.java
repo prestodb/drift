@@ -15,12 +15,12 @@
  */
 package com.facebook.drift.transport.netty.client;
 
+import com.facebook.drift.transport.client.DriftClientConfig;
+import com.facebook.drift.transport.client.MethodInvokerFactory;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import io.airlift.bootstrap.Bootstrap;
-import com.facebook.drift.transport.client.DriftClientConfig;
-import com.facebook.drift.transport.client.MethodInvokerFactory;
 import org.testng.annotations.Test;
 
 import java.lang.annotation.Annotation;

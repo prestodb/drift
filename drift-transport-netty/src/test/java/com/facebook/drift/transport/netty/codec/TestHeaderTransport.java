@@ -15,13 +15,13 @@
  */
 package com.facebook.drift.transport.netty.codec;
 
-import com.google.common.collect.ImmutableMap;
 import com.facebook.drift.TException;
 import com.facebook.drift.codec.internal.ProtocolWriter;
 import com.facebook.drift.protocol.TMessage;
 import com.facebook.drift.protocol.TProtocolWriter;
 import com.facebook.drift.transport.netty.buffer.TestingPooledByteBufAllocator;
 import com.facebook.drift.transport.netty.ssl.TChannelBufferOutputTransport;
+import com.google.common.collect.ImmutableMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import org.testng.annotations.Test;

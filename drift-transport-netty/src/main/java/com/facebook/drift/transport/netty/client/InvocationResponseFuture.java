@@ -16,13 +16,13 @@
 package com.facebook.drift.transport.netty.client;
 
 import com.facebook.drift.TException;
-import com.google.common.util.concurrent.AbstractFuture;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.facebook.drift.protocol.TTransportException;
 import com.facebook.drift.transport.client.ConnectionFailedException;
 import com.facebook.drift.transport.client.InvokeRequest;
 import com.facebook.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
+import com.google.common.util.concurrent.AbstractFuture;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;

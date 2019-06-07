@@ -15,6 +15,8 @@
  */
 package com.facebook.drift.transport.apache.client;
 
+import com.facebook.drift.transport.client.DriftClientConfig;
+import com.facebook.drift.transport.client.MethodInvokerFactory;
 import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -23,8 +25,6 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.airlift.configuration.ConfigBinder;
 import io.airlift.configuration.ConfigurationBinding;
-import com.facebook.drift.transport.client.DriftClientConfig;
-import com.facebook.drift.transport.client.MethodInvokerFactory;
 
 import java.lang.annotation.Annotation;
 

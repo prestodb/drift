@@ -15,11 +15,11 @@
  */
 package com.facebook.drift.transport.apache.client;
 
+import com.facebook.drift.transport.client.MethodInvoker;
+import com.facebook.drift.transport.client.MethodInvokerFactory;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
-import com.facebook.drift.transport.client.MethodInvoker;
-import com.facebook.drift.transport.client.MethodInvokerFactory;
 import io.airlift.security.pem.PemReader;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;

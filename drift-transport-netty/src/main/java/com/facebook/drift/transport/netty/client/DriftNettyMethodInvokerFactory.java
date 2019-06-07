@@ -15,13 +15,13 @@
  */
 package com.facebook.drift.transport.netty.client;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.net.HostAndPort;
 import com.facebook.drift.transport.client.MethodInvoker;
 import com.facebook.drift.transport.client.MethodInvokerFactory;
 import com.facebook.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
 import com.facebook.drift.transport.netty.ssl.SslContextFactory;
 import com.facebook.drift.transport.netty.ssl.SslContextFactory.SslContextParameters;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.net.HostAndPort;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -32,10 +32,10 @@ import java.io.Closeable;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static io.airlift.concurrent.Threads.daemonThreadsNamed;
 import static com.facebook.drift.transport.netty.codec.Protocol.COMPACT;
 import static com.facebook.drift.transport.netty.codec.Transport.HEADER;
 import static com.facebook.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
+import static io.airlift.concurrent.Threads.daemonThreadsNamed;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 

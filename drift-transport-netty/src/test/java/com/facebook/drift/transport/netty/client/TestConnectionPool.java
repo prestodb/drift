@@ -15,8 +15,8 @@
  */
 package com.facebook.drift.transport.netty.client;
 
-import com.google.common.net.HostAndPort;
 import com.facebook.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
+import com.google.common.net.HostAndPort;
 import io.airlift.units.DataSize;
 import io.airlift.units.Duration;
 import io.netty.channel.Channel;

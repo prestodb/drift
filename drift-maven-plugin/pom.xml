@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.airlift.drift</groupId>
+        <groupId>com.facebook.drift</groupId>
         <artifactId>drift-root</artifactId>
         <version>1.19-SNAPSHOT</version>
     </parent>
@@ -18,7 +18,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.airlift.drift</groupId>
+            <groupId>com.facebook.drift</groupId>
             <artifactId>drift-idl-generator</artifactId>
         </dependency>
 

@@ -1,7 +1,7 @@
 package its;
 
-import io.airlift.drift.annotations.ThriftEnum;
-import io.airlift.drift.annotations.ThriftEnumValue;
+import com.facebook.drift.annotations.ThriftEnum;
+import com.facebook.drift.annotations.ThriftEnumValue;
 
 /**
  * Type of fruit

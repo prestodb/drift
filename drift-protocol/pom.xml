@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.airlift.drift</groupId>
+        <groupId>com.facebook.drift</groupId>
         <artifactId>drift-root</artifactId>
         <version>1.19-SNAPSHOT</version>
     </parent>
@@ -18,7 +18,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.airlift.drift</groupId>
+            <groupId>com.facebook.drift</groupId>
             <artifactId>drift-api</artifactId>
         </dependency>
 
@@ -37,9 +37,9 @@
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <excludes combine.children="append">
-                        <exclude>src/main/java/io/airlift/drift/protocol/TBinaryProtocol.java</exclude>
-                        <exclude>src/main/java/io/airlift/drift/protocol/TCompactProtocol.java</exclude>
-                        <exclude>src/main/java/io/airlift/drift/protocol/TFacebookCompactProtocol.java</exclude>
+                        <exclude>src/main/java/com/facebook/drift/protocol/TBinaryProtocol.java</exclude>
+                        <exclude>src/main/java/com/facebook/drift/protocol/TCompactProtocol.java</exclude>
+                        <exclude>src/main/java/com/facebook/drift/protocol/TFacebookCompactProtocol.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

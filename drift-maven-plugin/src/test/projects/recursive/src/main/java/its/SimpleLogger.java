@@ -1,7 +1,7 @@
 package its;
 
-import io.airlift.drift.annotations.ThriftMethod;
-import io.airlift.drift.annotations.ThriftService;
+import com.facebook.drift.annotations.ThriftMethod;
+import com.facebook.drift.annotations.ThriftService;
 
 /**
  * Simple logging service.

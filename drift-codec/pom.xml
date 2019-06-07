@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.airlift.drift</groupId>
+        <groupId>com.facebook.drift</groupId>
         <artifactId>drift-root</artifactId>
         <version>1.19-SNAPSHOT</version>
     </parent>
@@ -14,17 +14,17 @@
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>
-        <shadeBase>io.airlift.drift.codec.\$internal</shadeBase>
+        <shadeBase>com.facebook.drift.codec.\$internal</shadeBase>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.airlift.drift</groupId>
+            <groupId>com.facebook.drift</groupId>
             <artifactId>drift-api</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>io.airlift.drift</groupId>
+            <groupId>com.facebook.drift</groupId>
             <artifactId>drift-protocol</artifactId>
         </dependency>
 

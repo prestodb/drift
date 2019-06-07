@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.airlift.drift</groupId>
+        <groupId>com.facebook.drift</groupId>
         <artifactId>drift-root</artifactId>
         <version>1.19-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
@@ -20,17 +20,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.airlift.drift</groupId>
+            <groupId>com.facebook.drift</groupId>
             <artifactId>drift-api</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>io.airlift.drift</groupId>
+            <groupId>com.facebook.drift</groupId>
             <artifactId>drift-codec</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>io.airlift.drift</groupId>
+            <groupId>com.facebook.drift</groupId>
             <artifactId>drift-protocol</artifactId>
         </dependency>
 

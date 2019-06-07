@@ -1,7 +1,7 @@
 package its;
 
-import io.airlift.drift.annotations.ThriftDocumentation;
-import io.airlift.drift.annotations.ThriftOrder;
+import com.facebook.drift.annotations.ThriftDocumentation;
+import com.facebook.drift.annotations.ThriftOrder;
 
 @ThriftDocumentation("Two dimensional point.")
 class Point$DriftMeta {

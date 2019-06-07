@@ -1,7 +1,7 @@
 package its;
 
-import io.airlift.drift.annotations.ThriftField;
-import io.airlift.drift.annotations.ThriftStruct;
+import com.facebook.drift.annotations.ThriftField;
+import com.facebook.drift.annotations.ThriftStruct;
 
 /**
  * Two dimensional point.

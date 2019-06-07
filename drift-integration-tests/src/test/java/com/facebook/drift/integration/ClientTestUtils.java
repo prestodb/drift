@@ -36,7 +36,6 @@ import com.google.inject.Scopes;
 import io.airlift.bootstrap.Bootstrap;
 import io.airlift.bootstrap.LifeCycleManager;
 import io.airlift.jmx.testing.TestingJmxModule;
-import org.testng.Assert;
 import org.weakref.jmx.guice.MBeanModule;
 
 import javax.inject.Inject;
@@ -143,8 +142,8 @@ final class ClientTestUtils
 
             assertEquals(user.getClient().log(headerValue, entries), DRIFT_OK);
             assertEquals(user.getClientCustom().log(headerValue, entries), DRIFT_OK);
-            Assert.assertEquals(user.getFactory().get().log(headerValue, entries), DRIFT_OK);
-            Assert.assertEquals(user.getFactoryCustom().get().log(headerValue, entries), DRIFT_OK);
+            assertEquals(user.getFactory().get().log(headerValue, entries), DRIFT_OK);
+            assertEquals(user.getFactoryCustom().get().log(headerValue, entries), DRIFT_OK);
 
             assertSame(scribe, user.getClient());
             assertNotSame(user.getClient(), user.getClientCustom());

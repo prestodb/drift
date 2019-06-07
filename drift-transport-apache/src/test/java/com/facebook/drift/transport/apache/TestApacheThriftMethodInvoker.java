@@ -52,7 +52,6 @@ import org.apache.thrift.transport.TNonblockingSocket;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportFactory;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -139,7 +138,7 @@ public class TestApacheThriftMethodInvoker
             socket.open();
             try {
                 TBinaryProtocol tp = new TBinaryProtocol(new TFramedTransport(socket));
-                Assert.assertEquals(new scribe.Client(tp).Log(messages), ResultCode.OK);
+                assertEquals(new scribe.Client(tp).Log(messages), ResultCode.OK);
             }
             finally {
                 socket.close();

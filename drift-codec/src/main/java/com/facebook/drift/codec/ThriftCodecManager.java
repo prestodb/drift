@@ -138,15 +138,15 @@ public final class ThriftCodecManager
                     }
 
                     switch (type.getProtocolType()) {
-                        case ThriftProtocolType.STRUCT:
+                        case STRUCT:
                             return factory.generateThriftTypeCodec(ThriftCodecManager.this, type.getStructMetadata());
-                        case ThriftProtocolType.MAP:
+                        case MAP:
                             return new MapThriftCodec<>(type, getElementCodec(type.getKeyTypeReference()), getElementCodec(type.getValueTypeReference()));
-                        case ThriftProtocolType.SET:
+                        case SET:
                             return new SetThriftCodec<>(type, getElementCodec(type.getValueTypeReference()));
-                        case ThriftProtocolType.LIST:
+                        case LIST:
                             return new ListThriftCodec<>(type, getElementCodec(type.getValueTypeReference()));
-                        case ThriftProtocolType.ENUM:
+                        case ENUM:
                             return new EnumThriftCodec<>(type);
                         default:
                             if (type.isCoerced()) {

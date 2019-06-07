@@ -68,7 +68,6 @@ import org.apache.thrift.transport.TNonblockingSocket;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportFactory;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -231,7 +230,7 @@ public class TestDriftNettyMethodInvoker
             try {
                 TProtocol tp = protocolFactory.getProtocol(framingFactory.getTransport(socket));
                 scribe.Client client = new scribe.Client(tp);
-                Assert.assertEquals(client.Log(messages), ResultCode.OK);
+                assertEquals(client.Log(messages), ResultCode.OK);
 
                 try {
                     client.Log(ImmutableList.of(new LogEntry("exception", "test")));

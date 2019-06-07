@@ -32,7 +32,6 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.TTransportFactory;
-import org.testng.Assert;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
@@ -41,6 +40,7 @@ import java.util.List;
 import java.util.function.ToIntFunction;
 
 import static com.facebook.drift.integration.ClientTestUtils.MESSAGES;
+import static org.testng.Assert.assertEquals;
 
 final class LegacyApacheThriftTesterUtil
 {
@@ -91,7 +91,7 @@ final class LegacyApacheThriftTesterUtil
                     throw new IllegalArgumentException("Unsupported protocol " + protocolType);
             }
 
-            Assert.assertEquals(new scribe.Client(protocol).Log(messages), ResultCode.OK);
+            assertEquals(new scribe.Client(protocol).Log(messages), ResultCode.OK);
         }
         catch (TException e) {
             throw new RuntimeException(e);

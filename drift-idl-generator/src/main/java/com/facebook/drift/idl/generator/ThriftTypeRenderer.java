@@ -15,7 +15,6 @@
  */
 package com.facebook.drift.idl.generator;
 
-import com.facebook.drift.codec.ThriftProtocolType;
 import com.facebook.drift.codec.metadata.ThriftType;
 import com.google.common.collect.ImmutableMap;
 
@@ -33,32 +32,32 @@ public class ThriftTypeRenderer
     public String toString(ThriftType type)
     {
         switch (type.getProtocolType()) {
-            case ThriftProtocolType.BOOL:
+            case BOOL:
                 return "bool";
-            case ThriftProtocolType.BYTE:
+            case BYTE:
                 return "byte";
-            case ThriftProtocolType.DOUBLE:
+            case DOUBLE:
                 return "double";
-            case ThriftProtocolType.I16:
+            case I16:
                 return "i16";
-            case ThriftProtocolType.I32:
+            case I32:
                 return "i32";
-            case ThriftProtocolType.I64:
+            case I64:
                 return "i64";
-            case ThriftProtocolType.ENUM:
+            case ENUM:
                 return prefix(type) + type.getEnumMetadata().getEnumName();
-            case ThriftProtocolType.MAP:
+            case MAP:
                 return String.format("map<%s, %s>", toString(type.getKeyTypeReference().get()), toString(type.getValueTypeReference().get()));
-            case ThriftProtocolType.SET:
+            case SET:
                 return String.format("set<%s>", toString(type.getValueTypeReference().get()));
-            case ThriftProtocolType.LIST:
+            case LIST:
                 return String.format("list<%s>", toString(type.getValueTypeReference().get()));
-            case ThriftProtocolType.STRUCT:
+            case STRUCT:
                 // VOID is encoded as a struct
                 return type.equals(ThriftType.VOID) ? "void" : prefix(type) + type.getStructMetadata().getStructName();
-            case ThriftProtocolType.STRING:
+            case STRING:
                 return "string";
-            case ThriftProtocolType.BINARY:
+            case BINARY:
                 return "binary";
         }
         throw new IllegalStateException("Bad protocol type: " + type.getProtocolType());

@@ -46,7 +46,6 @@ import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportFactory;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -135,7 +134,7 @@ public class TestDriftNettyServerTransport
 
                 // finish the second invocation, first invocation will not be completed
                 secondResult.set(DriftResultCode.OK);
-                Assert.assertEquals(readLogResponse(22, protocol), ResultCode.OK);
+                assertEquals(readLogResponse(22, protocol), ResultCode.OK);
                 assertFalse(firstResult.isDone());
 
                 // complete first invocation

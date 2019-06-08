@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import javax.annotation.concurrent.GuardedBy;
 
 import static java.lang.Math.toIntExact;
+import static java.util.Objects.requireNonNull;
 
 public class ThrowingServiceHandler
         implements ThrowingService
@@ -59,6 +60,7 @@ public class ThrowingServiceHandler
     @Override
     public synchronized String release()
     {
+        requireNonNull(awaitFuture, "release when there is no await is called");
         awaitFuture.set("OK");
         awaitFuture = null;
         return "OK";

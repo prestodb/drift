@@ -121,7 +121,7 @@ public class TestGuiceIntegration
             assertEquals(mismatchService.extraClientArgs(123, 456), 123);
             assertEquals(mismatchService.extraServerArgs(), 42);
 
-            assertThrowingService(throwingService);
+            assertThrowingService(throwingService, pooling);
         }
         finally {
             lifeCycleManager.stop();
@@ -214,26 +214,28 @@ public class TestGuiceIntegration
         assertThrows(EmptyOptionalException.class, () -> service.echoOptionalListString(null));
     }
 
-    private static void assertThrowingService(ThrowingService service)
+    private static void assertThrowingService(ThrowingService service, boolean pooling)
     {
         // make sure requests work after sending and receiving too large frame
         receiveTooLargeMessage(service);
         sendTooLargeMessage(service);
 
         // test that too large frame failures doesn't cause the failure of other requests on the same channel
-        ListenableFuture<String> awaitFuture = service.await();
-        assertFalse(awaitFuture.isDone());
-        receiveTooLargeMessage(service);
-        assertFalse(awaitFuture.isDone());
-        assertEquals(service.release(), "OK");
-        assertEquals(getUnchecked(awaitFuture), "OK");
+        if (pooling) {
+            ListenableFuture<String> awaitFuture = service.await();
+            assertFalse(awaitFuture.isDone());
+            receiveTooLargeMessage(service);
+            assertFalse(awaitFuture.isDone());
+            assertEquals(service.release(), "OK");
+            assertEquals(getUnchecked(awaitFuture), "OK");
 
-        awaitFuture = service.await();
-        assertFalse(awaitFuture.isDone());
-        sendTooLargeMessage(service);
-        assertFalse(awaitFuture.isDone());
-        assertEquals(service.release(), "OK");
-        assertEquals(getUnchecked(awaitFuture), "OK");
+            awaitFuture = service.await();
+            assertFalse(awaitFuture.isDone());
+            sendTooLargeMessage(service);
+            assertFalse(awaitFuture.isDone());
+            assertEquals(service.release(), "OK");
+            assertEquals(getUnchecked(awaitFuture), "OK");
+        }
 
         try {
             service.fail("no-retry", false);

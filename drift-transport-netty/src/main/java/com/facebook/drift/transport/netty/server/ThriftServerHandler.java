@@ -118,6 +118,7 @@ public class ThriftServerHandler
                             frameInfo.getTransport(),
                             frameInfo.getProtocol(),
                             frameInfo.getSequenceId(),
+                            frameInfo.getSequenceId(),
                             frameInfo.isSupportOutOfOrderResponse(),
                             PROTOCOL_ERROR,
                             e.getMessage(),
@@ -148,6 +149,7 @@ public class ThriftServerHandler
                     inputTransport,
                     frame.getTransport(),
                     frame.getProtocol(),
+                    frame.getSequenceId(),
                     frame.getHeaders(),
                     frame.isSupportOutOfOrderResponse());
             Futures.addCallback(response, new FutureCallback<ThriftFrame>()
@@ -186,6 +188,7 @@ public class ThriftServerHandler
             TTransport messageData,
             Transport transport,
             Protocol protocol,
+            int frameSequenceId,
             Map<String, String> headers,
             boolean supportOutOfOrderResponse)
             throws Exception
@@ -201,6 +204,7 @@ public class ThriftServerHandler
                     message.getName(),
                     transport,
                     protocol,
+                    frameSequenceId,
                     message.getSequenceId(),
                     supportOutOfOrderResponse,
                     UNKNOWN_METHOD,
@@ -215,6 +219,7 @@ public class ThriftServerHandler
                     message.getName(),
                     transport,
                     protocol,
+                    frameSequenceId,
                     message.getSequenceId(),
                     supportOutOfOrderResponse,
                     INVALID_MESSAGE_TYPE,
@@ -230,7 +235,7 @@ public class ThriftServerHandler
                 .transformAsync(
                         value -> {
                             try {
-                                return immediateFuture(writeSuccessResponse(context, method, transport, protocol, message.getSequenceId(), supportOutOfOrderResponse, value));
+                                return immediateFuture(writeSuccessResponse(context, method, transport, protocol, frameSequenceId, message.getSequenceId(), supportOutOfOrderResponse, value));
                             }
                             catch (Exception e) {
                                 return immediateFailedFuture(e);
@@ -242,7 +247,7 @@ public class ThriftServerHandler
                         Exception.class,
                         exception -> {
                             try {
-                                return immediateFuture(writeExceptionResponse(context, method, transport, protocol, message.getSequenceId(), supportOutOfOrderResponse, exception));
+                                return immediateFuture(writeExceptionResponse(context, method, transport, protocol, frameSequenceId, message.getSequenceId(), supportOutOfOrderResponse, exception));
                             }
                             catch (Exception e) {
                                 return immediateFailedFuture(e);
@@ -309,7 +314,8 @@ public class ThriftServerHandler
             MethodMetadata methodMetadata,
             Transport transport,
             Protocol protocol,
-            int sequenceId,
+            int frameSequenceId,
+            int messageSequenceId,
             boolean supportOutOfOrderResponse,
             Object result)
             throws Exception
@@ -319,14 +325,14 @@ public class ThriftServerHandler
             writeResponse(
                     methodMetadata.getName(),
                     protocol.createProtocol(outputTransport),
-                    sequenceId,
+                    messageSequenceId,
                     "success",
                     (short) 0,
                     methodMetadata.getResultCodec(),
                     result);
 
             return new ThriftFrame(
-                    sequenceId,
+                    frameSequenceId,
                     outputTransport.getBuffer(),
                     ImmutableMap.of(),
                     transport,
@@ -342,7 +348,8 @@ public class ThriftServerHandler
             MethodMetadata methodMetadata,
             Transport transport,
             Protocol protocol,
-            int sequenceId,
+            int frameSequenceId,
+            int messageSequenceId,
             boolean supportOutOfOrderResponse,
             Throwable exception)
             throws Exception
@@ -356,14 +363,14 @@ public class ThriftServerHandler
                 writeResponse(
                         methodMetadata.getName(),
                         protocolWriter,
-                        sequenceId,
+                        messageSequenceId,
                         "exception",
                         exceptionId.get(),
                         methodMetadata.getExceptionCodecs().get(exceptionId.get()),
                         exception);
 
                 return new ThriftFrame(
-                        sequenceId,
+                        frameSequenceId,
                         outputTransport.getBuffer(),
                         ImmutableMap.of(),
                         transport,
@@ -384,7 +391,8 @@ public class ThriftServerHandler
                 methodMetadata.getName(),
                 transport,
                 protocol,
-                sequenceId,
+                frameSequenceId,
+                messageSequenceId,
                 supportOutOfOrderResponse,
                 type,
                 "Internal error processing " + methodMetadata.getName() + ": " + exception.getMessage(),
@@ -396,6 +404,7 @@ public class ThriftServerHandler
             String methodName,
             Transport transport,
             Protocol protocol,
+            int frameSequenceId,
             int sequenceId,
             boolean supportOutOfOrderResponse,
             TApplicationException.Type errorCode,
@@ -418,7 +427,7 @@ public class ThriftServerHandler
 
             protocolWriter.writeMessageEnd();
             return new ThriftFrame(
-                    sequenceId,
+                    frameSequenceId,
                     outputTransport.getBuffer(),
                     ImmutableMap.of(),
                     transport,
@@ -433,14 +442,14 @@ public class ThriftServerHandler
     private static void writeResponse(
             String methodName,
             TProtocolWriter protocolWriter,
-            int sequenceId,
+            int messageSequenceId,
             String responseFieldName,
             short responseFieldId,
             ThriftCodec<Object> responseCodec,
             Object result)
             throws Exception
     {
-        protocolWriter.writeMessageBegin(new TMessage(methodName, REPLY, sequenceId));
+        protocolWriter.writeMessageBegin(new TMessage(methodName, REPLY, messageSequenceId));
 
         ProtocolWriter writer = new ProtocolWriter(protocolWriter);
         writer.writeStructBegin(methodName + "_result");

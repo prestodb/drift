@@ -16,6 +16,7 @@
 package com.facebook.drift.transport.netty.codec;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
@@ -47,10 +48,10 @@ class ThriftFramedDecoder
     @Override
     protected void decode(ChannelHandlerContext context, ByteBuf buffer, List<Object> output)
     {
-        decode(buffer).ifPresent(output::add);
+        decode(context.alloc(), buffer).ifPresent(output::add);
     }
 
-    private Optional<ByteBuf> decode(ByteBuf buffer)
+    private Optional<ByteBuf> decode(ByteBufAllocator bufAllocator, ByteBuf buffer)
     {
         if (bytesToDiscard > 0) {
             discardTooLongFrame(buffer);
@@ -66,7 +67,7 @@ class ThriftFramedDecoder
 
         if (frameSizeInBytes > maxFrameSizeInBytes) {
             // this invocation doesn't move the readerIndex
-            Optional<FrameInfo> frameInfo = frameInfoDecoder.tryDecodeFrameInfo(buffer);
+            Optional<FrameInfo> frameInfo = frameInfoDecoder.tryDecodeFrameInfo(bufAllocator, buffer);
             if (frameInfo.isPresent()) {
                 tooLongFrameInfo = frameInfo;
                 tooLongFrameSizeInBytes = frameSizeInBytes;

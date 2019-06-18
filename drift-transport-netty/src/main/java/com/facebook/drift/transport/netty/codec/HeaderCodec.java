@@ -29,7 +29,7 @@ public class HeaderCodec
         if (message instanceof ByteBuf) {
             ByteBuf request = (ByteBuf) message;
             if (request.isReadable()) {
-                context.fireChannelRead(HeaderTransport.decodeFrame(request));
+                context.fireChannelRead(HeaderTransport.decodeFrame(context.alloc(), request));
                 return;
             }
         }
@@ -40,7 +40,7 @@ public class HeaderCodec
     public void write(ChannelHandlerContext context, Object message, ChannelPromise promise)
     {
         if (message instanceof ThriftFrame) {
-            context.write(HeaderTransport.encodeFrame((ThriftFrame) message), promise);
+            context.write(HeaderTransport.encodeFrame(context.alloc(), (ThriftFrame) message), promise);
         }
         else {
             context.write(message, promise);

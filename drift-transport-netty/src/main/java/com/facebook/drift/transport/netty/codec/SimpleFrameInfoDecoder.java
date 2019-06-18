@@ -20,6 +20,7 @@ import com.facebook.drift.protocol.TMessage;
 import com.facebook.drift.protocol.TProtocol;
 import com.facebook.drift.transport.netty.ssl.TChannelBufferInputTransport;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 
 import java.util.Optional;
 
@@ -40,7 +41,7 @@ public class SimpleFrameInfoDecoder
     }
 
     @Override
-    public Optional<FrameInfo> tryDecodeFrameInfo(ByteBuf buffer)
+    public Optional<FrameInfo> tryDecodeFrameInfo(ByteBufAllocator bufAllocator, ByteBuf buffer)
     {
         TChannelBufferInputTransport transport = new TChannelBufferInputTransport(buffer.retainedDuplicate());
         try {

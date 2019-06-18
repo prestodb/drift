@@ -30,11 +30,13 @@ import com.facebook.drift.transport.netty.codec.FrameInfo;
 import com.facebook.drift.transport.netty.codec.FrameTooLargeException;
 import com.facebook.drift.transport.netty.codec.Protocol;
 import com.facebook.drift.transport.netty.codec.ThriftFrame;
+import com.facebook.drift.transport.netty.codec.ThriftHeaderTransform;
 import com.facebook.drift.transport.netty.codec.Transport;
 import com.facebook.drift.transport.netty.ssl.TChannelBufferInputTransport;
 import com.facebook.drift.transport.netty.ssl.TChannelBufferOutputTransport;
 import com.facebook.drift.transport.server.ServerInvokeRequest;
 import com.facebook.drift.transport.server.ServerMethodInvoker;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Primitives;
 import com.google.common.util.concurrent.FluentFuture;
@@ -50,6 +52,7 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -115,6 +118,7 @@ public class ThriftServerHandler
                     context.writeAndFlush(writeApplicationException(
                             context,
                             frameInfo.getMethodName(),
+                            ImmutableList.of(),
                             frameInfo.getTransport(),
                             frameInfo.getProtocol(),
                             frameInfo.getSequenceId(),
@@ -150,6 +154,7 @@ public class ThriftServerHandler
                     frame.getTransport(),
                     frame.getProtocol(),
                     frame.getSequenceId(),
+                    frame.getTransforms(),
                     frame.getHeaders(),
                     frame.isSupportOutOfOrderResponse());
             Futures.addCallback(response, new FutureCallback<ThriftFrame>()
@@ -189,6 +194,7 @@ public class ThriftServerHandler
             Transport transport,
             Protocol protocol,
             int frameSequenceId,
+            List<ThriftHeaderTransform> transforms,
             Map<String, String> headers,
             boolean supportOutOfOrderResponse)
             throws Exception
@@ -202,6 +208,7 @@ public class ThriftServerHandler
             return immediateFuture(writeApplicationException(
                     context,
                     message.getName(),
+                    transforms,
                     transport,
                     protocol,
                     frameSequenceId,
@@ -217,6 +224,7 @@ public class ThriftServerHandler
             return immediateFuture(writeApplicationException(
                     context,
                     message.getName(),
+                    transforms,
                     transport,
                     protocol,
                     frameSequenceId,
@@ -235,7 +243,16 @@ public class ThriftServerHandler
                 .transformAsync(
                         value -> {
                             try {
-                                return immediateFuture(writeSuccessResponse(context, method, transport, protocol, frameSequenceId, message.getSequenceId(), supportOutOfOrderResponse, value));
+                                return immediateFuture(writeSuccessResponse(
+                                        context,
+                                        method,
+                                        transforms,
+                                        transport,
+                                        protocol,
+                                        frameSequenceId,
+                                        message.getSequenceId(),
+                                        supportOutOfOrderResponse,
+                                        value));
                             }
                             catch (Exception e) {
                                 return immediateFailedFuture(e);
@@ -247,7 +264,16 @@ public class ThriftServerHandler
                         Exception.class,
                         exception -> {
                             try {
-                                return immediateFuture(writeExceptionResponse(context, method, transport, protocol, frameSequenceId, message.getSequenceId(), supportOutOfOrderResponse, exception));
+                                return immediateFuture(writeExceptionResponse(
+                                        context,
+                                        method,
+                                        transforms,
+                                        transport,
+                                        protocol,
+                                        frameSequenceId,
+                                        message.getSequenceId(),
+                                        supportOutOfOrderResponse,
+                                        exception));
                             }
                             catch (Exception e) {
                                 return immediateFailedFuture(e);
@@ -312,6 +338,7 @@ public class ThriftServerHandler
     private static ThriftFrame writeSuccessResponse(
             ChannelHandlerContext context,
             MethodMetadata methodMetadata,
+            List<ThriftHeaderTransform> transforms,
             Transport transport,
             Protocol protocol,
             int frameSequenceId,
@@ -335,6 +362,7 @@ public class ThriftServerHandler
                     frameSequenceId,
                     outputTransport.getBuffer(),
                     ImmutableMap.of(),
+                    transforms,
                     transport,
                     protocol,
                     supportOutOfOrderResponse);
@@ -346,6 +374,7 @@ public class ThriftServerHandler
 
     private static ThriftFrame writeExceptionResponse(ChannelHandlerContext context,
             MethodMetadata methodMetadata,
+            List<ThriftHeaderTransform> transforms,
             Transport transport,
             Protocol protocol,
             int frameSequenceId,
@@ -373,6 +402,7 @@ public class ThriftServerHandler
                         frameSequenceId,
                         outputTransport.getBuffer(),
                         ImmutableMap.of(),
+                        transforms,
                         transport,
                         protocol,
                         supportOutOfOrderResponse);
@@ -389,6 +419,7 @@ public class ThriftServerHandler
         return writeApplicationException(
                 context,
                 methodMetadata.getName(),
+                transforms,
                 transport,
                 protocol,
                 frameSequenceId,
@@ -402,6 +433,7 @@ public class ThriftServerHandler
     private static ThriftFrame writeApplicationException(
             ChannelHandlerContext context,
             String methodName,
+            List<ThriftHeaderTransform> transforms,
             Transport transport,
             Protocol protocol,
             int frameSequenceId,
@@ -430,6 +462,7 @@ public class ThriftServerHandler
                     frameSequenceId,
                     outputTransport.getBuffer(),
                     ImmutableMap.of(),
+                    transforms,
                     transport,
                     protocol,
                     supportOutOfOrderResponse);

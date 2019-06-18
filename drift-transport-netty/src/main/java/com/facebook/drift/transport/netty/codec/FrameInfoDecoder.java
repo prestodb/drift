@@ -16,6 +16,7 @@
 package com.facebook.drift.transport.netty.codec;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 
 import java.util.Optional;
 
@@ -24,5 +25,5 @@ interface FrameInfoDecoder
     /**
      * Attempts to decode basic frame info without moving the reader index
      */
-    Optional<FrameInfo> tryDecodeFrameInfo(ByteBuf buffer);
+    Optional<FrameInfo> tryDecodeFrameInfo(ByteBufAllocator bufAllocator, ByteBuf buffer);
 }

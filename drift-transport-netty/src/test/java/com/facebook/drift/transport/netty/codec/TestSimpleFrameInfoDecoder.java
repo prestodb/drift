@@ -53,13 +53,13 @@ public class TestSimpleFrameInfoDecoder
         FrameInfoDecoder decoder = new SimpleFrameInfoDecoder(FRAMED, protocol, true);
         ByteBuf message = createTestMessage(allocator, protocol);
         try {
-            assertFalse(decoder.tryDecodeFrameInfo(message.slice(0, 0)).isPresent());
-            assertFalse(decoder.tryDecodeFrameInfo(message.slice(0, 1)).isPresent());
-            assertFalse(decoder.tryDecodeFrameInfo(message.slice(0, 2)).isPresent());
-            assertFalse(decoder.tryDecodeFrameInfo(message.slice(0, 5)).isPresent());
-            assertTrue(decoder.tryDecodeFrameInfo(message.slice(0, message.readableBytes())).isPresent());
-            assertTrue(decoder.tryDecodeFrameInfo(message).isPresent());
-            assertEquals(decoder.tryDecodeFrameInfo(message).get(), new FrameInfo(METHOD_NAME, CALL, SEQUENCE_ID, FRAMED, protocol, true));
+            assertFalse(decoder.tryDecodeFrameInfo(allocator, message.slice(0, 0)).isPresent());
+            assertFalse(decoder.tryDecodeFrameInfo(allocator, message.slice(0, 1)).isPresent());
+            assertFalse(decoder.tryDecodeFrameInfo(allocator, message.slice(0, 2)).isPresent());
+            assertFalse(decoder.tryDecodeFrameInfo(allocator, message.slice(0, 5)).isPresent());
+            assertTrue(decoder.tryDecodeFrameInfo(allocator, message.slice(0, message.readableBytes())).isPresent());
+            assertTrue(decoder.tryDecodeFrameInfo(allocator, message).isPresent());
+            assertEquals(decoder.tryDecodeFrameInfo(allocator, message).get(), new FrameInfo(METHOD_NAME, CALL, SEQUENCE_ID, FRAMED, protocol, true));
         }
         finally {
             message.release();

@@ -15,11 +15,13 @@
  */
 package com.facebook.drift.transport.netty.codec;
 
+import com.google.common.collect.ImmutableList;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.ReferenceCounted;
 
 import javax.annotation.CheckReturnValue;
 
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
@@ -31,15 +33,24 @@ public class ThriftFrame
     private final int sequenceId;
     private final ByteBuf message;
     private final Map<String, String> headers;
+    private final List<ThriftHeaderTransform> transforms;
     private final Transport transport;
     private final Protocol protocol;
     private final boolean supportOutOfOrderResponse;
 
-    public ThriftFrame(int sequenceId, ByteBuf message, Map<String, String> headers, Transport transport, Protocol protocol, boolean supportOutOfOrderResponse)
+    public ThriftFrame(
+            int sequenceId,
+            ByteBuf message,
+            Map<String, String> headers,
+            List<ThriftHeaderTransform> transforms,
+            Transport transport,
+            Protocol protocol,
+            boolean supportOutOfOrderResponse)
     {
         this.sequenceId = sequenceId;
         this.message = requireNonNull(message, "message is null");
         this.headers = requireNonNull(headers, "headers is null");
+        this.transforms = ImmutableList.copyOf(requireNonNull(transforms, "transform is null"));
         this.transport = requireNonNull(transport, "transport is null");
         this.protocol = requireNonNull(protocol, "protocol is null");
         this.supportOutOfOrderResponse = supportOutOfOrderResponse;
@@ -61,6 +72,11 @@ public class ThriftFrame
     public Map<String, String> getHeaders()
     {
         return headers;
+    }
+
+    public List<ThriftHeaderTransform> getTransforms()
+    {
+        return transforms;
     }
 
     public Transport getTransport()

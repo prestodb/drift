@@ -37,6 +37,7 @@ import com.facebook.drift.transport.netty.codec.ThriftFrame;
 import com.facebook.drift.transport.netty.codec.Transport;
 import com.facebook.drift.transport.netty.ssl.TChannelBufferInputTransport;
 import com.facebook.drift.transport.netty.ssl.TChannelBufferOutputTransport;
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.AbstractFuture;
 import io.airlift.units.Duration;
 import io.netty.buffer.ByteBuf;
@@ -140,6 +141,7 @@ public class ThriftClientHandler
                     sequenceId,
                     requestBuffer,
                     thriftRequest.getHeaders(),
+                    ImmutableList.of(),
                     transport,
                     protocol,
                     true);

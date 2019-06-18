@@ -18,6 +18,7 @@ package com.facebook.drift.transport.netty.codec;
 import com.facebook.drift.protocol.TMessage;
 import com.facebook.drift.protocol.TTransportException;
 import com.facebook.drift.transport.netty.ssl.TChannelBufferInputTransport;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
@@ -51,6 +52,7 @@ public class SimpleFrameCodec
                         extractResponseSequenceId(buffer.retain()),
                         buffer,
                         ImmutableMap.of(),
+                        ImmutableList.of(),
                         transport,
                         protocol,
                         assumeClientsSupportOutOfOrderResponses));

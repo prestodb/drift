@@ -15,8 +15,8 @@
  */
 package com.facebook.drift.transport.apache.client;
 
+import com.facebook.airlift.configuration.Config;
 import com.google.common.net.HostAndPort;
-import io.airlift.configuration.Config;
 
 public class ApacheThriftConnectionFactoryConfig
 {

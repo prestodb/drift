@@ -15,12 +15,12 @@
  */
 package com.facebook.drift.client;
 
+import com.facebook.airlift.testing.TestingTicker;
 import com.facebook.drift.transport.client.InvokeRequest;
 import com.facebook.drift.transport.client.MethodInvoker;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import io.airlift.testing.TestingTicker;
 import io.airlift.units.Duration;
 
 import javax.annotation.concurrent.GuardedBy;

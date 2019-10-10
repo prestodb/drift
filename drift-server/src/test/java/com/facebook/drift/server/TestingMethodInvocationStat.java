@@ -21,8 +21,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.facebook.airlift.testing.Assertions.assertGreaterThan;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static io.airlift.testing.Assertions.assertGreaterThan;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 

@@ -15,6 +15,8 @@
  */
 package com.facebook.drift.client.address;
 
+import com.facebook.airlift.bootstrap.Bootstrap;
+import com.facebook.airlift.bootstrap.LifeCycleManager;
 import com.facebook.drift.annotations.ThriftMethod;
 import com.facebook.drift.annotations.ThriftService;
 import com.facebook.drift.client.guice.AddressSelectorBinder;
@@ -24,17 +26,15 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import io.airlift.bootstrap.Bootstrap;
-import io.airlift.bootstrap.LifeCycleManager;
 import org.testng.annotations.Test;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
+import static com.facebook.airlift.testing.Assertions.assertInstanceOf;
 import static com.facebook.drift.client.address.SimpleAddressSelectorBinder.simpleAddressSelector;
 import static com.facebook.drift.client.guice.DriftClientAnnotationFactory.getDriftClientAnnotation;
-import static io.airlift.testing.Assertions.assertInstanceOf;
 import static org.testng.Assert.assertEquals;
 
 public class TestSimpleAddressSelectorBinder

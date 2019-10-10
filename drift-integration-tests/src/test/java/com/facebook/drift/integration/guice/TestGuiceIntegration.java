@@ -15,6 +15,8 @@
  */
 package com.facebook.drift.integration.guice;
 
+import com.facebook.airlift.bootstrap.Bootstrap;
+import com.facebook.airlift.bootstrap.LifeCycleManager;
 import com.facebook.drift.TApplicationException;
 import com.facebook.drift.TException;
 import com.facebook.drift.client.ExceptionClassification;
@@ -28,8 +30,6 @@ import com.facebook.drift.transport.netty.client.DriftNettyClientModule;
 import com.facebook.drift.transport.netty.server.DriftNettyServerModule;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Injector;
-import io.airlift.bootstrap.Bootstrap;
-import io.airlift.bootstrap.LifeCycleManager;
 import org.testng.annotations.Test;
 
 import java.io.IOException;

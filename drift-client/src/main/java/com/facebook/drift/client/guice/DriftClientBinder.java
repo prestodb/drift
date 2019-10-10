@@ -15,6 +15,7 @@
  */
 package com.facebook.drift.client.guice;
 
+import com.facebook.airlift.configuration.ConfigDefaults;
 import com.facebook.drift.client.DriftClient;
 import com.facebook.drift.client.DriftClientFactory;
 import com.facebook.drift.client.DriftClientFactoryManager;
@@ -38,7 +39,6 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
-import io.airlift.configuration.ConfigDefaults;
 import org.weakref.jmx.MBeanExporter;
 
 import javax.inject.Inject;
@@ -51,13 +51,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.facebook.airlift.configuration.ConfigBinder.configBinder;
 import static com.facebook.drift.client.ExceptionClassifier.mergeExceptionClassifiers;
 import static com.facebook.drift.client.guice.DriftClientAnnotationFactory.extractDriftClientBindingAnnotation;
 import static com.facebook.drift.client.guice.DriftClientAnnotationFactory.getDriftClientAnnotation;
 import static com.facebook.drift.codec.metadata.ThriftServiceMetadata.getThriftServiceAnnotation;
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
-import static io.airlift.configuration.ConfigBinder.configBinder;
 import static java.util.Objects.requireNonNull;
 
 public class DriftClientBinder

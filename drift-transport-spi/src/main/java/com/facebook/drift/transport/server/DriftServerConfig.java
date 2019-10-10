@@ -15,7 +15,7 @@
  */
 package com.facebook.drift.transport.server;
 
-import io.airlift.configuration.Config;
+import com.facebook.airlift.configuration.Config;
 
 public class DriftServerConfig
 {

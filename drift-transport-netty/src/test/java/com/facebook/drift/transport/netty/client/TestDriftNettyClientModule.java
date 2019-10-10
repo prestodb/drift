@@ -15,18 +15,18 @@
  */
 package com.facebook.drift.transport.netty.client;
 
+import com.facebook.airlift.bootstrap.Bootstrap;
 import com.facebook.drift.transport.client.DriftClientConfig;
 import com.facebook.drift.transport.client.MethodInvokerFactory;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
-import io.airlift.bootstrap.Bootstrap;
 import org.testng.annotations.Test;
 
 import java.lang.annotation.Annotation;
 
+import static com.facebook.airlift.configuration.ConfigBinder.configBinder;
 import static com.google.inject.name.Names.named;
-import static io.airlift.configuration.ConfigBinder.configBinder;
 import static org.testng.Assert.assertNotNull;
 
 public class TestDriftNettyClientModule

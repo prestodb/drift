@@ -27,8 +27,8 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Optional;
 
+import static com.facebook.airlift.configuration.ConfigBinder.configBinder;
 import static com.google.common.base.Preconditions.checkArgument;
-import static io.airlift.configuration.ConfigBinder.configBinder;
 import static java.util.Objects.requireNonNull;
 
 public final class SimpleAddressSelectorBinder

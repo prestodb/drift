@@ -36,12 +36,12 @@ import javax.inject.Provider;
 import java.lang.annotation.Annotation;
 import java.util.Optional;
 
+import static com.facebook.airlift.configuration.ConfigBinder.configBinder;
 import static com.facebook.drift.codec.metadata.ThriftServiceMetadata.getThriftServiceAnnotation;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.inject.Scopes.SINGLETON;
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
-import static io.airlift.configuration.ConfigBinder.configBinder;
 import static java.util.Objects.requireNonNull;
 
 public class DriftServerBinder

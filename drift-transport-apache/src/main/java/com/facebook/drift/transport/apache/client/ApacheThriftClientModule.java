@@ -15,6 +15,8 @@
  */
 package com.facebook.drift.transport.apache.client;
 
+import com.facebook.airlift.configuration.ConfigBinder;
+import com.facebook.airlift.configuration.ConfigurationBinding;
 import com.facebook.drift.transport.client.DriftClientConfig;
 import com.facebook.drift.transport.client.MethodInvokerFactory;
 import com.google.inject.Binder;
@@ -23,12 +25,10 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import io.airlift.configuration.ConfigBinder;
-import io.airlift.configuration.ConfigurationBinding;
 
 import java.lang.annotation.Annotation;
 
-import static io.airlift.configuration.ConfigBinder.configBinder;
+import static com.facebook.airlift.configuration.ConfigBinder.configBinder;
 
 public class ApacheThriftClientModule
         implements Module

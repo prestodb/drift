@@ -32,8 +32,8 @@ import javax.inject.Provider;
 
 import java.lang.annotation.Annotation;
 
+import static com.facebook.airlift.configuration.ConfigBinder.configBinder;
 import static com.google.common.base.Preconditions.checkState;
-import static io.airlift.configuration.ConfigBinder.configBinder;
 import static java.util.Objects.requireNonNull;
 
 public class DriftNettyClientModule

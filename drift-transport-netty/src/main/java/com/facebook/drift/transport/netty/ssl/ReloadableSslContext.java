@@ -34,9 +34,9 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
+import static com.facebook.airlift.security.pem.PemReader.loadPrivateKey;
+import static com.facebook.airlift.security.pem.PemReader.readCertificateChain;
 import static com.google.common.hash.Hashing.sha256;
-import static io.airlift.security.pem.PemReader.loadPrivateKey;
-import static io.airlift.security.pem.PemReader.readCertificateChain;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.SECONDS;
 

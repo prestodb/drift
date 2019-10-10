@@ -15,6 +15,9 @@
  */
 package com.facebook.drift.integration;
 
+import com.facebook.airlift.bootstrap.Bootstrap;
+import com.facebook.airlift.bootstrap.LifeCycleManager;
+import com.facebook.airlift.jmx.testing.TestingJmxModule;
 import com.facebook.drift.client.DriftClient;
 import com.facebook.drift.client.MethodInvocationFilter;
 import com.facebook.drift.client.address.AddressSelector;
@@ -31,9 +34,6 @@ import com.google.common.net.HostAndPort;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
-import io.airlift.bootstrap.Bootstrap;
-import io.airlift.bootstrap.LifeCycleManager;
-import io.airlift.jmx.testing.TestingJmxModule;
 import org.weakref.jmx.guice.MBeanModule;
 
 import javax.inject.Inject;
@@ -52,10 +52,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.facebook.airlift.security.pem.PemReader.loadKeyStore;
+import static com.facebook.airlift.security.pem.PemReader.loadTrustStore;
 import static com.facebook.drift.client.guice.DriftClientBinder.driftClientBinder;
 import static com.facebook.drift.client.guice.MethodInvocationFilterBinder.staticFilterBinder;
-import static io.airlift.security.pem.PemReader.loadKeyStore;
-import static io.airlift.security.pem.PemReader.loadTrustStore;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;

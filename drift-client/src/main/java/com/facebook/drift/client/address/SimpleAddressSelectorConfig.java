@@ -15,10 +15,10 @@
  */
 package com.facebook.drift.client.address;
 
+import com.facebook.airlift.configuration.Config;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.net.HostAndPort;
-import io.airlift.configuration.Config;
 
 import javax.validation.constraints.NotNull;
 

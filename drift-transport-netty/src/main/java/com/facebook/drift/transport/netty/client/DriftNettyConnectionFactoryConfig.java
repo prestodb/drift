@@ -15,8 +15,8 @@
  */
 package com.facebook.drift.transport.netty.client;
 
+import com.facebook.airlift.configuration.Config;
 import com.google.common.net.HostAndPort;
-import io.airlift.configuration.Config;
 import io.airlift.units.Duration;
 import io.airlift.units.MinDuration;
 

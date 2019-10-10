@@ -15,9 +15,9 @@
  */
 package com.facebook.drift.server.stats;
 
+import com.facebook.airlift.stats.CounterStat;
+import com.facebook.airlift.stats.TimeStat;
 import com.google.common.util.concurrent.ListenableFuture;
-import io.airlift.stats.CounterStat;
-import io.airlift.stats.TimeStat;
 import org.weakref.jmx.Managed;
 import org.weakref.jmx.Nested;
 

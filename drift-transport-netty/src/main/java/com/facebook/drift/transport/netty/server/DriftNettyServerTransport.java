@@ -33,8 +33,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
+import static com.facebook.airlift.concurrent.Threads.threadsNamed;
 import static com.facebook.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
-import static io.airlift.concurrent.Threads.threadsNamed;
 import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.SO_BACKLOG;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;

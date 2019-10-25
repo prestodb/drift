@@ -17,11 +17,10 @@ package com.facebook.drift.codec.guice;
 
 import com.facebook.drift.codec.BonkConstructor;
 import com.facebook.drift.codec.ThriftCodec;
-import com.facebook.drift.codec.metadata.ThriftType;
+import com.facebook.drift.codec.customizations.ValueClass;
+import com.facebook.drift.codec.customizations.ValueClassCodec;
 import com.facebook.drift.protocol.TCompactProtocol;
 import com.facebook.drift.protocol.TMemoryBuffer;
-import com.facebook.drift.protocol.TProtocolReader;
-import com.facebook.drift.protocol.TProtocolWriter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Guice;
@@ -33,10 +32,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-import static com.google.common.base.MoreObjects.toStringHelper;
-import static java.util.Objects.requireNonNull;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
@@ -56,28 +52,7 @@ public class TestThriftCodecModule
 
                     ThriftCodecBinder.thriftCodecBinder(binder).bindThriftCodec(new TypeLiteral<Map<Integer, List<String>>>() {});
 
-                    ThriftCodecBinder.thriftCodecBinder(binder).bindCustomThriftCodec(new ThriftCodec<ValueClass>()
-                    {
-                        @Override
-                        public ThriftType getType()
-                        {
-                            return new ThriftType(ThriftType.STRING, ValueClass.class);
-                        }
-
-                        @Override
-                        public ValueClass read(TProtocolReader protocol)
-                                throws Exception
-                        {
-                            return new ValueClass(protocol.readString());
-                        }
-
-                        @Override
-                        public void write(ValueClass value, TProtocolWriter protocol)
-                                throws Exception
-                        {
-                            protocol.writeString(value.getValue());
-                        }
-                    });
+                    ThriftCodecBinder.thriftCodecBinder(binder).bindCustomThriftCodec(new ValueClassCodec());
                 });
 
         testRoundTripSerialize(
@@ -115,47 +90,5 @@ public class TestThriftCodecModule
 
         // verify they are the same
         assertEquals(copy, value);
-    }
-
-    public static class ValueClass
-    {
-        private final String value;
-
-        public ValueClass(String value)
-        {
-            this.value = requireNonNull(value, "value is null");
-        }
-
-        public String getValue()
-        {
-            return value;
-        }
-
-        @Override
-        public boolean equals(Object o)
-        {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            ValueClass that = (ValueClass) o;
-            return Objects.equals(value, that.value);
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return Objects.hash(value);
-        }
-
-        @Override
-        public String toString()
-        {
-            return toStringHelper(this)
-                    .add("value", value)
-                    .toString();
-        }
     }
 }

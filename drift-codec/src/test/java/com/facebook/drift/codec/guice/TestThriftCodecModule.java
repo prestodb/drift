@@ -17,6 +17,7 @@ package com.facebook.drift.codec.guice;
 
 import com.facebook.drift.codec.BonkConstructor;
 import com.facebook.drift.codec.ThriftCodec;
+import com.facebook.drift.codec.customizations.CustomizedBonk;
 import com.facebook.drift.codec.customizations.ValueClass;
 import com.facebook.drift.codec.customizations.ValueClassCodec;
 import com.facebook.drift.protocol.TCompactProtocol;
@@ -53,6 +54,7 @@ public class TestThriftCodecModule
                     ThriftCodecBinder.thriftCodecBinder(binder).bindThriftCodec(new TypeLiteral<Map<Integer, List<String>>>() {});
 
                     ThriftCodecBinder.thriftCodecBinder(binder).bindCustomThriftCodec(new ValueClassCodec());
+                    ThriftCodecBinder.thriftCodecBinder(binder).bindThriftCodec(CustomizedBonk.class);
                 });
 
         testRoundTripSerialize(
@@ -74,6 +76,10 @@ public class TestThriftCodecModule
         testRoundTripSerialize(
                 injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<ValueClass>>() {})),
                 new ValueClass("my value"));
+
+        testRoundTripSerialize(
+                injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<CustomizedBonk>>() {})),
+                new CustomizedBonk(new ValueClass("customized message"), 42));
     }
 
     public static <T> void testRoundTripSerialize(ThriftCodec<T> codec, T value)

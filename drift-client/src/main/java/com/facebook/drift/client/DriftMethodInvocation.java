@@ -330,7 +330,8 @@ class DriftMethodInvocation<A extends Address>
                 invocationAttempts,
                 succinctNanos(ticker.read() - startTime),
                 failedConnections,
-                overloadedRejects);
+                overloadedRejects,
+                attemptedAddresses);
 
         // attach message exception to the exception thrown to caller
         if (cause instanceof DriftApplicationException) {

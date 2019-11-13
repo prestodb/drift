@@ -15,7 +15,11 @@
  */
 package com.facebook.drift.client;
 
+import com.facebook.drift.transport.client.Address;
+import com.google.common.collect.ImmutableSet;
 import io.airlift.units.Duration;
+
+import java.util.Set;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -27,20 +31,29 @@ public class RetriesFailedException
     private final int failedConnections;
     private final Duration retryTime;
     private final int overloadedRejects;
+    private final Set<? extends Address> attemptedAddresses;
 
-    public RetriesFailedException(String reason, int invocationAttempts, Duration retryTime, int failedConnections, int overloadedRejects)
+    public RetriesFailedException(
+            String reason,
+            int invocationAttempts,
+            Duration retryTime,
+            int failedConnections,
+            int overloadedRejects,
+            Set<? extends Address> attemptedAddresses)
     {
         super(format(
-                "%s (invocationAttempts: %s, duration: %s, failedConnections: %s, overloadedRejects: %s)",
+                "%s (invocationAttempts: %s, duration: %s, failedConnections: %s, overloadedRejects: %s, attemptedAddresses: %s)",
                 reason,
                 invocationAttempts,
                 retryTime,
                 failedConnections,
-                overloadedRejects));
+                overloadedRejects,
+                attemptedAddresses));
         this.invocationAttempts = invocationAttempts;
         this.failedConnections = failedConnections;
         this.retryTime = requireNonNull(retryTime, "retryTime is null");
         this.overloadedRejects = overloadedRejects;
+        this.attemptedAddresses = ImmutableSet.copyOf(requireNonNull(attemptedAddresses, "attemptedAddresses is null"));
     }
 
     public int getInvocationAttempts()
@@ -61,5 +74,10 @@ public class RetriesFailedException
     public int getOverloadedRejects()
     {
         return overloadedRejects;
+    }
+
+    public Set<? extends Address> getAttemptedAddresses()
+    {
+        return attemptedAddresses;
     }
 }

@@ -21,10 +21,13 @@ import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import static com.facebook.drift.protocol.TProtocolUtil.readAllInBatches;
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Double.doubleToLongBits;
 import static java.lang.Double.longBitsToDouble;
 import static java.lang.Float.floatToIntBits;
 import static java.lang.Float.intBitsToFloat;
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
@@ -772,6 +775,19 @@ public class TFacebookCompactProtocol
         byte[] buf = new byte[length];
         transport.read(buf, 0, length);
         return ByteBuffer.wrap(buf);
+    }
+
+    /**
+     * Read data from wire directly into the buffer.
+     */
+    @Override
+    public int readBinary(byte[] buf, int offset)
+            throws TException
+    {
+        int size = checkSize(readVarint32());
+        checkArgument((buf.length - offset) >= size, format("Binary is too large to be read into buffer: binary size: %s, buffer size: %s, buffer offset: %s", size, buf.length, offset));
+
+        return readAllInBatches(transport, buf, offset, size);
     }
 
     /**

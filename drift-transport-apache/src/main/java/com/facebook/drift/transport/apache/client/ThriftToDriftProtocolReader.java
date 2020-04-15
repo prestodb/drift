@@ -291,4 +291,10 @@ public class ThriftToDriftProtocolReader
             throw new TException(e);
         }
     }
+
+    @Override
+    public int readBinary(byte[] buf, int offset)
+    {
+        throw new UnsupportedOperationException();
+    }
 }

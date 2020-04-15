@@ -83,4 +83,7 @@ public interface TProtocolReader
 
     ByteBuffer readBinary()
             throws TException;
+
+    int readBinary(byte[] buf, int offset)
+            throws TException;
 }

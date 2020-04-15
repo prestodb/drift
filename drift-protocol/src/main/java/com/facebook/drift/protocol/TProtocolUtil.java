@@ -94,4 +94,17 @@ public final class TProtocolUtil
                 throw new TProtocolException("Unknown type: " + type);
         }
     }
+
+    public static int readAllInBatches(TTransport transport, byte[] buf, int offset, int size)
+            throws TException
+    {
+        while (size > 0) {
+            // read data in 64KB chunks to optimize buffer allocation inside the JVM
+            int readSize = Math.min(size, 65536);
+            transport.read(buf, offset, readSize);
+            size -= readSize;
+            offset += readSize;
+        }
+        return size;
+    }
 }

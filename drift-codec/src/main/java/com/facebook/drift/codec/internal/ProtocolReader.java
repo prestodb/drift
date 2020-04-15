@@ -127,6 +127,18 @@ public class ProtocolReader
         return fieldValue;
     }
 
+    public int readBinaryField(byte[] buf, int offset)
+            throws TException
+    {
+        if (!checkReadState(TType.STRING)) {
+            return 0;
+        }
+        currentField = null;
+        int length = protocol.readBinary(buf, offset);
+        protocol.readFieldEnd();
+        return length;
+    }
+
     public boolean readBoolField()
             throws TException
     {

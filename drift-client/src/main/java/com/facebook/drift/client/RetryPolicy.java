@@ -104,10 +104,16 @@ public class RetryPolicy
             return new ExceptionClassification(Optional.of(TRUE), DOWN);
         }
 
-        if (idempotent && throwable instanceof RequestTimeoutException) {
+        if (throwable instanceof RequestTimeoutException) {
             // We don't know if the server is overloaded, or if this specific
             // request just takes to long, so just mark the server as normal.
-            return new ExceptionClassification(Optional.of(TRUE), NORMAL);
+            // If the request is idempotent we mark it as a retryable exception
+            if (idempotent) {
+                return new ExceptionClassification(Optional.of(TRUE), NORMAL);
+            }
+            else {
+                return new ExceptionClassification(Optional.of(FALSE), NORMAL);
+            }
         }
 
         if (throwable instanceof MessageTooLargeException) {
@@ -125,10 +131,16 @@ public class RetryPolicy
             return result;
         }
 
-        if (idempotent && throwable instanceof TTransportException) {
+        if (throwable instanceof TTransportException) {
             // We don't know if there is a problem with this server or if this
             // is a general network error, so just mark the server as normal.
-            return new ExceptionClassification(Optional.of(TRUE), NORMAL);
+            // If the request is idempotent we mark it as a retryable exception
+            if (idempotent) {
+                return new ExceptionClassification(Optional.of(TRUE), NORMAL);
+            }
+            else {
+                return new ExceptionClassification(Optional.of(FALSE), NORMAL);
+            }
         }
 
         return result;

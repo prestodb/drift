@@ -69,7 +69,7 @@ class ConnectionFactory
             Promise<Channel> promise = group.next().newPromise();
             promise.setUncancellable();
             bootstrap.connect(new InetSocketAddress(address.getHost(), address.getPort()))
-                    .addListener((ChannelFutureListener) future -> notifyConnect(future, promise));
+                    .addListener((ChannelFutureListener) channelFuture -> notifyConnect(channelFuture, promise));
             return promise;
         }
         catch (Throwable e) {
@@ -77,17 +77,17 @@ class ConnectionFactory
         }
     }
 
-    private static void notifyConnect(ChannelFuture future, Promise<Channel> promise)
+    private static void notifyConnect(ChannelFuture channelFuture, Promise<Channel> promise)
     {
-        if (future.isSuccess()) {
-            Channel channel = future.channel();
+        if (channelFuture.isSuccess()) {
+            Channel channel = channelFuture.channel();
             if (!promise.trySuccess(channel)) {
                 // Promise was completed in the meantime (likely cancelled), just release the channel again
                 channel.close();
             }
         }
         else {
-            promise.tryFailure(future.cause());
+            promise.tryFailure(channelFuture.cause());
         }
     }
 

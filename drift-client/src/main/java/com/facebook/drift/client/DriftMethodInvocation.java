@@ -192,16 +192,16 @@ class DriftMethodInvocation<A extends Address>
             Futures.addCallback(result, new FutureCallback<Object>()
                     {
                         @Override
-                        public void onSuccess(Object result)
+                        public void onSuccess(Object resultOfInvocation)
                         {
                             resetConnectionFailures(address);
-                            set(result);
+                            set(resultOfInvocation);
                         }
 
                         @Override
-                        public void onFailure(Throwable t)
+                        public void onFailure(Throwable throwable)
                         {
-                            handleFailure(address, t);
+                            handleFailure(address, throwable);
                         }
                     },
                     directExecutor());

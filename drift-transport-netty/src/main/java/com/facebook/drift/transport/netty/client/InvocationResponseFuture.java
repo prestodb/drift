@@ -46,7 +46,7 @@ class InvocationResponseFuture
     private Future<Channel> connectionFuture;
 
     @GuardedBy("this")
-    private ThriftRequest invocationFuture;
+    private ThriftRequest thriftRequest;
 
     static InvocationResponseFuture createInvocationResponseFuture(InvokeRequest request, ConnectionParameters connectionParameters, ConnectionManager connectionManager)
     {
@@ -103,8 +103,8 @@ class InvocationResponseFuture
         }
 
         try {
-            invocationFuture = new ThriftRequest(request.getMethod(), request.getParameters(), request.getHeaders());
-            Futures.addCallback(invocationFuture, new FutureCallback<Object>()
+            thriftRequest = new ThriftRequest(request.getMethod(), request.getParameters(), request.getHeaders());
+            Futures.addCallback(thriftRequest, new FutureCallback<Object>()
                     {
                         @Override
                         public void onSuccess(Object result)
@@ -131,7 +131,7 @@ class InvocationResponseFuture
                     },
                     directExecutor());
 
-            ChannelFuture sendFuture = channel.writeAndFlush(invocationFuture);
+            ChannelFuture sendFuture = channel.writeAndFlush(thriftRequest);
             sendFuture.addListener(channelFuture -> {
                 try {
                     if (!channelFuture.isSuccess()) {
@@ -158,8 +158,8 @@ class InvocationResponseFuture
         if (connectionFuture != null) {
             connectionFuture.cancel(wasInterrupted);
         }
-        if (invocationFuture != null) {
-            invocationFuture.cancel(wasInterrupted);
+        if (thriftRequest != null) {
+            thriftRequest.cancel(wasInterrupted);
         }
     }
 

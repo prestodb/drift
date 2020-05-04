@@ -26,6 +26,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollSocketChannel;
+import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
@@ -36,6 +37,8 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.primitives.Ints.saturatedCast;
 import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
+import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
+import static io.netty.channel.ChannelOption.WRITE_BUFFER_WATER_MARK;
 import static java.util.Objects.requireNonNull;
 
 class ConnectionFactory
@@ -72,7 +75,11 @@ class ConnectionFactory
                     .group(group)
                     .channel(socketChannelClass)
                     .option(ALLOCATOR, allocator)
+                    .option(SO_KEEPALIVE, true)
                     .option(CONNECT_TIMEOUT_MILLIS, saturatedCast(connectionParameters.getConnectTimeout().toMillis()))
+                    .option(WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(
+                            saturatedCast(connectionFactoryConfig.getWriteLowWaterMark().toBytes()),
+                            saturatedCast(connectionFactoryConfig.getWriteHighWaterMark().toBytes())))
                     .handler(new ThriftClientInitializer(
                             connectionParameters.getTransport(),
                             connectionParameters.getProtocol(),

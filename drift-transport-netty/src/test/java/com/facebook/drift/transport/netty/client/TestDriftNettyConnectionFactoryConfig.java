@@ -17,6 +17,7 @@ package com.facebook.drift.transport.netty.client;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
+import io.airlift.units.DataSize;
 import io.airlift.units.Duration;
 import org.testng.annotations.Test;
 
@@ -25,6 +26,8 @@ import java.util.Map;
 import static com.facebook.airlift.configuration.testing.ConfigAssertions.assertFullMapping;
 import static com.facebook.airlift.configuration.testing.ConfigAssertions.assertRecordedDefaults;
 import static com.facebook.airlift.configuration.testing.ConfigAssertions.recordDefaults;
+import static io.airlift.units.DataSize.Unit.KILOBYTE;
+import static io.airlift.units.DataSize.Unit.MEGABYTE;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class TestDriftNettyConnectionFactoryConfig
@@ -40,6 +43,9 @@ public class TestDriftNettyConnectionFactoryConfig
                 .setSslContextRefreshTime(new Duration(1, MINUTES))
                 .setSocksProxy(null)
                 .setNativeTransportEnabled(false));
+                .setSocksProxy(null)
+                .setWriteLowWaterMark(new DataSize(64, KILOBYTE))
+                .setWriteHighWaterMark(new DataSize(1, MEGABYTE)));
     }
 
     @Test
@@ -53,6 +59,8 @@ public class TestDriftNettyConnectionFactoryConfig
                 .put("thrift.client.ssl-context.refresh-time", "33m")
                 .put("thrift.client.socks-proxy", "example.com:9876")
                 .put("thrift.client.native-transport.enabled", "true")
+                .put("thrift.client.write.low-watermark", "128kB")
+                .put("thrift.client.write.high-watermark", "256kB")
                 .build();
 
         DriftNettyConnectionFactoryConfig expected = new DriftNettyConnectionFactoryConfig()
@@ -63,6 +71,9 @@ public class TestDriftNettyConnectionFactoryConfig
                 .setSslContextRefreshTime(new Duration(33, MINUTES))
                 .setSocksProxy(HostAndPort.fromParts("example.com", 9876))
                 .setNativeTransportEnabled(true);
+                .setSocksProxy(HostAndPort.fromParts("example.com", 9876))
+                .setWriteLowWaterMark(new DataSize(128, KILOBYTE))
+                .setWriteHighWaterMark(new DataSize(256, KILOBYTE));
 
         assertFullMapping(properties, expected);
     }

@@ -15,6 +15,7 @@
  */
 package com.facebook.drift.transport.netty.client;
 
+import com.facebook.airlift.log.Logger;
 import com.facebook.drift.TApplicationException;
 import com.facebook.drift.TException;
 import com.facebook.drift.codec.ThriftCodec;
@@ -37,11 +38,13 @@ import com.facebook.drift.transport.netty.codec.ThriftFrame;
 import com.facebook.drift.transport.netty.codec.Transport;
 import com.facebook.drift.transport.netty.ssl.TChannelBufferInputTransport;
 import com.facebook.drift.transport.netty.ssl.TChannelBufferOutputTransport;
+import com.facebook.drift.transport.netty.throttle.ThrottleLock;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.AbstractFuture;
 import io.airlift.units.Duration;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -67,6 +70,7 @@ import static com.facebook.drift.protocol.TMessageType.CALL;
 import static com.facebook.drift.protocol.TMessageType.EXCEPTION;
 import static com.facebook.drift.protocol.TMessageType.ONEWAY;
 import static com.facebook.drift.protocol.TMessageType.REPLY;
+import static com.facebook.drift.transport.netty.client.ConnectionPool.THROTTLE_LOCK_KEY;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -77,6 +81,7 @@ public class ThriftClientHandler
         extends ChannelDuplexHandler
 {
     private static final int ONEWAY_SEQUENCE_ID = 0xFFFF_FFFF;
+    private static final Logger log = Logger.get(ThriftClientHandler.class);
 
     private final Duration requestTimeout;
     private final Transport transport;
@@ -84,7 +89,7 @@ public class ThriftClientHandler
 
     private final ConcurrentHashMap<Integer, RequestHandler> pendingRequests = new ConcurrentHashMap<>();
     private final AtomicReference<TException> channelError = new AtomicReference<>();
-    private final AtomicInteger sequenceId = new AtomicInteger(42);
+    private static final AtomicInteger sequenceId = new AtomicInteger(42);
 
     ThriftClientHandler(Duration requestTimeout, Transport transport, Protocol protocol)
     {
@@ -209,6 +214,21 @@ public class ThriftClientHandler
     public void channelInactive(ChannelHandlerContext context)
     {
         onError(context, new TTransportException("Client was disconnected by server"), Optional.empty());
+    }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx)
+            throws Exception
+    {
+        Channel channel = ctx.channel();
+        ThrottleLock throttleLock = channel.attr(THROTTLE_LOCK_KEY).get();
+        if (channel.isWritable()) {
+            synchronized (throttleLock) {
+                log.info("channelWritabilityChanged : Unlocking Channel " + channel.id().asShortText());
+                throttleLock.notifyAll();
+            }
+        }
+        ctx.fireChannelWritabilityChanged();
     }
 
     private void onError(ChannelHandlerContext context, Throwable throwable, Optional<RequestHandler> currentRequest)

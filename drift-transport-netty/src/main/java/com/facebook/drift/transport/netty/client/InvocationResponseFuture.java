@@ -15,12 +15,14 @@
  */
 package com.facebook.drift.transport.netty.client;
 
+import com.facebook.airlift.log.Logger;
 import com.facebook.drift.TException;
 import com.facebook.drift.protocol.TTransportException;
 import com.facebook.drift.transport.client.ConnectionFailedException;
 import com.facebook.drift.transport.client.InvokeRequest;
 import com.facebook.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
 import com.facebook.drift.transport.netty.client.ThriftClientHandler.ThriftRequest;
+import com.facebook.drift.transport.netty.throttle.ThrottleLock;
 import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -31,13 +33,16 @@ import io.netty.util.concurrent.Future;
 import javax.annotation.concurrent.GuardedBy;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
+import static com.facebook.drift.transport.netty.client.ConnectionPool.THROTTLE_LOCK_KEY;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static java.util.Objects.requireNonNull;
 
 class InvocationResponseFuture
         extends AbstractFuture<Object>
 {
+    private static final Logger log = Logger.get(InvocationResponseFuture.class);
     private final InvokeRequest request;
     private final ConnectionParameters connectionParameters;
     private final ConnectionManager connectionManager;
@@ -78,7 +83,21 @@ class InvocationResponseFuture
                 try {
                     if (channelFuture.isSuccess()) {
                         // Netty future listener generic type declaration requires a cast when used with a lambda
-                        tryInvocation((Channel) channelFuture.getNow());
+                        Channel channel = (Channel) channelFuture.getNow();
+                        ThrottleLock throttleLock = channel.attr(THROTTLE_LOCK_KEY).get();
+                        //If the connection is pooled, check for throttling else do direct invocation
+                        if (throttleLock != null) {
+                            synchronized (throttleLock) {
+                                while (!channel.isWritable()) {
+                                    log.info("Waiting since channel " + channel.id().asShortText() + " is not writeable");
+                                    throttleLock.wait(TimeUnit.MILLISECONDS.toMillis(100));
+                                }
+                                tryInvocation(channel);
+                            }
+                        }
+                        else {
+                            tryInvocation(channel);
+                        }
                     }
                     else {
                         fatalError(new ConnectionFailedException(request.getAddress(), channelFuture.cause()));

@@ -38,7 +38,8 @@ public class TestDriftNettyConnectionFactoryConfig
                 .setConnectionPoolMaxSize(1000)
                 .setConnectionPoolIdleTimeout(new Duration(1, MINUTES))
                 .setSslContextRefreshTime(new Duration(1, MINUTES))
-                .setSocksProxy(null));
+                .setSocksProxy(null)
+                .setNativeTransportEnabled(false));
     }
 
     @Test
@@ -51,6 +52,7 @@ public class TestDriftNettyConnectionFactoryConfig
                 .put("thrift.client.connection-pool.idle-timeout", "7m")
                 .put("thrift.client.ssl-context.refresh-time", "33m")
                 .put("thrift.client.socks-proxy", "example.com:9876")
+                .put("thrift.client.native-transport.enabled", "true")
                 .build();
 
         DriftNettyConnectionFactoryConfig expected = new DriftNettyConnectionFactoryConfig()
@@ -59,7 +61,8 @@ public class TestDriftNettyConnectionFactoryConfig
                 .setConnectionPoolMaxSize(555)
                 .setConnectionPoolIdleTimeout(new Duration(7, MINUTES))
                 .setSslContextRefreshTime(new Duration(33, MINUTES))
-                .setSocksProxy(HostAndPort.fromParts("example.com", 9876));
+                .setSocksProxy(HostAndPort.fromParts("example.com", 9876))
+                .setNativeTransportEnabled(true);
 
         assertFullMapping(properties, expected);
     }

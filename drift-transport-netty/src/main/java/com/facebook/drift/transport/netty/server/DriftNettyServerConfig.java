@@ -16,6 +16,7 @@
 package com.facebook.drift.transport.netty.server;
 
 import com.facebook.airlift.configuration.Config;
+import com.facebook.airlift.configuration.ConfigDescription;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import io.airlift.units.DataSize;
@@ -57,6 +58,7 @@ public class DriftNettyServerConfig
     private Duration sessionTimeout = new Duration(1, DAYS);
 
     private boolean assumeClientsSupportOutOfOrderResponses = true;
+    private boolean nativeTransportEnabled;
 
     @Min(0)
     @Max(65535)
@@ -271,6 +273,19 @@ public class DriftNettyServerConfig
     public DriftNettyServerConfig setAssumeClientsSupportOutOfOrderResponses(boolean assumeClientsSupportOutOfOrderResponses)
     {
         this.assumeClientsSupportOutOfOrderResponses = assumeClientsSupportOutOfOrderResponses;
+        return this;
+    }
+
+    public boolean isNativeTransportEnabled()
+    {
+        return nativeTransportEnabled;
+    }
+
+    @Config("thrift.server.native-transport.enabled")
+    @ConfigDescription("Enable Native Transport")
+    public DriftNettyServerConfig setNativeTransportEnabled(boolean nativeTransportEnabled)
+    {
+        this.nativeTransportEnabled = nativeTransportEnabled;
         return this;
     }
 }

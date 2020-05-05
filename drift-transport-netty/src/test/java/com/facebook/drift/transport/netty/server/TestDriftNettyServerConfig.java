@@ -52,7 +52,8 @@ public class TestDriftNettyServerConfig
                 .setSessionCacheSize(10_000)
                 .setSessionTimeout(new Duration(1, DAYS))
                 .setCiphers("")
-                .setAssumeClientsSupportOutOfOrderResponses(true));
+                .setAssumeClientsSupportOutOfOrderResponses(true)
+                .setNativeTransportEnabled(false));
     }
 
     @Test
@@ -75,6 +76,7 @@ public class TestDriftNettyServerConfig
                 .put("thrift.server.ssl.session-timeout", "78h")
                 .put("thrift.server.ssl.ciphers", "some_cipher")
                 .put("thrift.server.assume-clients-support-out-of-order-responses", "false")
+                .put("thrift.server.native-transport.enabled", "true")
                 .build();
 
         DriftNettyServerConfig expected = new DriftNettyServerConfig()
@@ -93,7 +95,8 @@ public class TestDriftNettyServerConfig
                 .setSessionCacheSize(678)
                 .setSessionTimeout(new Duration(78, HOURS))
                 .setCiphers("some_cipher")
-                .setAssumeClientsSupportOutOfOrderResponses(false);
+                .setAssumeClientsSupportOutOfOrderResponses(false)
+                .setNativeTransportEnabled(true);
 
         assertFullMapping(properties, expected);
     }

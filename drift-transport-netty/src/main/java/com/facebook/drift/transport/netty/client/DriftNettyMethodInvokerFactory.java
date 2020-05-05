@@ -24,6 +24,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.HostAndPort;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 
 import javax.annotation.PreDestroy;
@@ -36,6 +38,7 @@ import static com.facebook.airlift.concurrent.Threads.daemonThreadsNamed;
 import static com.facebook.drift.transport.netty.codec.Protocol.COMPACT;
 import static com.facebook.drift.transport.netty.codec.Transport.HEADER;
 import static com.facebook.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -75,13 +78,18 @@ public class DriftNettyMethodInvokerFactory<I>
     {
         requireNonNull(factoryConfig, "factoryConfig is null");
 
-        group = new NioEventLoopGroup(factoryConfig.getThreadCount(), daemonThreadsNamed("drift-client-%s"));
-
+        if (factoryConfig.isNativeTransportEnabled()) {
+            checkState(Epoll.isAvailable(), "native transport is not available");
+            group = new EpollEventLoopGroup(factoryConfig.getThreadCount(), daemonThreadsNamed("drift-client-%s"));
+        }
+        else {
+            group = new NioEventLoopGroup(factoryConfig.getThreadCount(), daemonThreadsNamed("drift-client-%s"));
+        }
         this.clientConfigurationProvider = requireNonNull(clientConfigurationProvider, "clientConfigurationProvider is null");
         this.sslContextFactory = createSslContextFactory(true, factoryConfig.getSslContextRefreshTime(), group);
         this.defaultSocksProxy = Optional.ofNullable(factoryConfig.getSocksProxy());
 
-        ConnectionManager connectionManager = new ConnectionFactory(group, sslContextFactory, allocator);
+        ConnectionManager connectionManager = new ConnectionFactory(group, sslContextFactory, allocator, factoryConfig);
         if (factoryConfig.isConnectionPoolEnabled()) {
             connectionManager = new ConnectionPool(connectionManager, group, factoryConfig.getConnectionPoolMaxSize(), factoryConfig.getConnectionPoolIdleTimeout());
         }

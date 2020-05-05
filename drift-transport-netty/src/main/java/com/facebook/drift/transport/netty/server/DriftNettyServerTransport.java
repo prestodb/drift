@@ -23,6 +23,9 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslContext;
@@ -35,6 +38,7 @@ import java.util.function.Supplier;
 
 import static com.facebook.airlift.concurrent.Threads.threadsNamed;
 import static com.facebook.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
+import static com.google.common.base.Preconditions.checkState;
 import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.SO_BACKLOG;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
@@ -65,10 +69,18 @@ public class DriftNettyServerTransport
         requireNonNull(methodInvoker, "methodInvoker is null");
         requireNonNull(config, "config is null");
         this.port = config.getPort();
-
-        ioGroup = new NioEventLoopGroup(config.getIoThreadCount(), threadsNamed("drift-server-io-%s"));
-
-        workerGroup = new NioEventLoopGroup(config.getWorkerThreadCount(), threadsNamed("drift-server-worker-%s"));
+        Class serverSocketChannelClass;
+        if (config.isNativeTransportEnabled()) {
+            checkState(Epoll.isAvailable(), "native transport is not available");
+            ioGroup = new EpollEventLoopGroup(config.getIoThreadCount(), threadsNamed("drift-server-io-%s"));
+            workerGroup = new EpollEventLoopGroup(config.getWorkerThreadCount(), threadsNamed("drift-server-worker-%s"));
+            serverSocketChannelClass = EpollServerSocketChannel.class;
+        }
+        else {
+            ioGroup = new NioEventLoopGroup(config.getIoThreadCount(), threadsNamed("drift-server-io-%s"));
+            workerGroup = new NioEventLoopGroup(config.getWorkerThreadCount(), threadsNamed("drift-server-worker-%s"));
+            serverSocketChannelClass = NioServerSocketChannel.class;
+        }
 
         Optional<Supplier<SslContext>> sslContext = Optional.empty();
         if (config.isSslEnabled()) {
@@ -97,7 +109,7 @@ public class DriftNettyServerTransport
 
         bootstrap = new ServerBootstrap()
                 .group(ioGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
+                .channel(serverSocketChannelClass)
                 .childHandler(serverInitializer)
                 .option(SO_BACKLOG, config.getAcceptBacklog())
                 .option(ALLOCATOR, allocator)

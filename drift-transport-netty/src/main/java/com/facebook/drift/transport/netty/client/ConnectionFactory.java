@@ -24,12 +24,15 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
 
 import java.net.InetSocketAddress;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.primitives.Ints.saturatedCast;
 import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
@@ -41,21 +44,33 @@ class ConnectionFactory
     private final EventLoopGroup group;
     private final SslContextFactory sslContextFactory;
     private final ByteBufAllocator allocator;
+    private DriftNettyConnectionFactoryConfig connectionFactoryConfig;
 
-    ConnectionFactory(EventLoopGroup group, SslContextFactory sslContextFactory, ByteBufAllocator allocator)
+    ConnectionFactory(
+            EventLoopGroup group,
+            SslContextFactory sslContextFactory,
+            ByteBufAllocator allocator,
+            DriftNettyConnectionFactoryConfig connectionFactoryConfig)
     {
         this.group = requireNonNull(group, "group is null");
         this.sslContextFactory = requireNonNull(sslContextFactory, "sslContextFactory is null");
         this.allocator = requireNonNull(allocator, "allocator is null");
+        this.connectionFactoryConfig = requireNonNull(connectionFactoryConfig, "connectionFactoryConfig is null");
     }
 
     @Override
     public Future<Channel> getConnection(ConnectionParameters connectionParameters, HostAndPort address)
     {
+        Class socketChannelClass = NioSocketChannel.class;
+        if (connectionFactoryConfig.isNativeTransportEnabled()) {
+            checkState(Epoll.isAvailable(), "native transport is not available");
+            socketChannelClass = EpollSocketChannel.class;
+        }
+
         try {
             Bootstrap bootstrap = new Bootstrap()
                     .group(group)
-                    .channel(NioSocketChannel.class)
+                    .channel(socketChannelClass)
                     .option(ALLOCATOR, allocator)
                     .option(CONNECT_TIMEOUT_MILLIS, saturatedCast(connectionParameters.getConnectTimeout().toMillis()))
                     .handler(new ThriftClientInitializer(

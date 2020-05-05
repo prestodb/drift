@@ -16,6 +16,7 @@
 package com.facebook.drift.transport.netty.client;
 
 import com.facebook.airlift.configuration.Config;
+import com.facebook.airlift.configuration.ConfigDescription;
 import com.google.common.net.HostAndPort;
 import io.airlift.units.Duration;
 import io.airlift.units.MinDuration;
@@ -36,6 +37,7 @@ public class DriftNettyConnectionFactoryConfig
 
     private Duration sslContextRefreshTime = new Duration(1, MINUTES);
     private HostAndPort socksProxy;
+    private boolean nativeTransportEnabled;
 
     public int getThreadCount()
     {
@@ -109,6 +111,19 @@ public class DriftNettyConnectionFactoryConfig
     public DriftNettyConnectionFactoryConfig setSocksProxy(HostAndPort socksProxy)
     {
         this.socksProxy = socksProxy;
+        return this;
+    }
+
+    public boolean isNativeTransportEnabled()
+    {
+        return nativeTransportEnabled;
+    }
+
+    @Config("thrift.client.native-transport.enabled")
+    @ConfigDescription("Enable Native Transport")
+    public DriftNettyConnectionFactoryConfig setNativeTransportEnabled(boolean nativeTransportEnabled)
+    {
+        this.nativeTransportEnabled = nativeTransportEnabled;
         return this;
     }
 }

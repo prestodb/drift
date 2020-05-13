@@ -98,11 +98,12 @@ public final class TProtocolUtil
     public static int readAllInBatches(TTransport transport, byte[] buf, int offset, int size)
             throws TException
     {
-        while (size > 0) {
+        int remainingLength = size;
+        while (remainingLength > 0) {
             // read data in 64KB chunks to optimize buffer allocation inside the JVM
-            int readSize = Math.min(size, 65536);
+            int readSize = Math.min(remainingLength, 65536);
             transport.read(buf, offset, readSize);
-            size -= readSize;
+            remainingLength -= readSize;
             offset += readSize;
         }
         return size;

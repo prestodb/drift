@@ -61,6 +61,12 @@ public class DelegateCodec<T>
         getCodec().write(value, protocol);
     }
 
+    @Override
+    public boolean isNull(T value)
+    {
+        return getCodec().isNull(value);
+    }
+
     private ThriftCodec<T> getCodec()
     {
         ThriftCodec<T> codec = codecManager.getCachedCodecIfPresent(typeToken);

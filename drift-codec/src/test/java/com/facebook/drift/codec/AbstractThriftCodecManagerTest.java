@@ -563,6 +563,14 @@ public abstract class AbstractThriftCodecManagerTest
     }
 
     @Test
+    public void testStructWithRecursiveOptionalStruct()
+            throws Exception
+    {
+        RecursiveOptionalStruct struct = new RecursiveOptionalStruct(Optional.of(new RecursiveOptionalStruct.InnerOptionalStruct(Optional.empty())));
+        testRoundTripSerialize(struct);
+    }
+
+    @Test
     public void testRecursiveStructWithIdlAnnotation()
             throws Exception
     {

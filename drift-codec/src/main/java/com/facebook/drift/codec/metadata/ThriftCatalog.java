@@ -660,7 +660,7 @@ public final class ThriftCatalog
     }
 
     @SuppressWarnings("PMD.EmptyCatchBlock")
-    public static Integer getMethodOrder(Method method)
+    public static Optional<Integer> getMethodOrder(Method method)
     {
         ThriftOrder order = method.getAnnotation(ThriftOrder.class);
 
@@ -675,7 +675,7 @@ public final class ThriftCatalog
             }
         }
 
-        return order == null ? null : order.value();
+        return order == null ? Optional.empty() : Optional.of(order.value());
     }
 
     private ThriftStructMetadata extractThriftStructMetadata(Type structType)

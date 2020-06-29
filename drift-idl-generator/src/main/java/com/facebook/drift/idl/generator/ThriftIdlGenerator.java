@@ -274,29 +274,29 @@ public class ThriftIdlGenerator
     {
         boolean ok = true;
 
-        for (Map.Entry<String, ThriftMethodMetadata> method : service.getMethods().entrySet()) {
-            for (ThriftFieldMetadata field : method.getValue().getParameters()) {
+        for (ThriftMethodMetadata method : service.getMethods()) {
+            for (ThriftFieldMetadata field : method.getParameters()) {
                 if (!verifyField(field.getThriftType())) {
                     ok = false;
                     if (!quiet) {
-                        throw new ThriftIdlGeneratorException(format("Unknown argument type %s in %s.%s", typeName(field.getThriftType()), service.getName(), method.getKey()));
+                        throw new ThriftIdlGeneratorException(format("Unknown argument type %s in %s.%s", typeName(field.getThriftType()), service.getName(), method.getName()));
                     }
                 }
             }
 
-            for (ThriftType exception : method.getValue().getExceptions().values()) {
+            for (ThriftType exception : method.getExceptions().values()) {
                 if (!verifyField(exception)) {
                     ok = false;
                     if (!quiet) {
-                        throw new ThriftIdlGeneratorException(format("Unknown exception type %s in %s.%s", typeName(exception), service.getName(), method.getKey()));
+                        throw new ThriftIdlGeneratorException(format("Unknown exception type %s in %s.%s", typeName(exception), service.getName(), method.getName()));
                     }
                 }
             }
 
-            if (!method.getValue().getReturnType().equals(ThriftType.VOID) && !verifyField(method.getValue().getReturnType())) {
+            if (!method.getReturnType().equals(ThriftType.VOID) && !verifyField(method.getReturnType())) {
                 ok = false;
                 if (!quiet) {
-                    throw new ThriftIdlGeneratorException(format("Unknown return type %s in %s.%s", typeName(method.getValue().getReturnType()), service.getName(), method.getKey()));
+                    throw new ThriftIdlGeneratorException(format("Unknown return type %s in %s.%s", typeName(method.getReturnType()), service.getName(), method.getName()));
                 }
             }
         }

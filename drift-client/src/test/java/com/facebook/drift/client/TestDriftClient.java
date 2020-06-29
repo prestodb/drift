@@ -344,19 +344,19 @@ public class TestDriftClient
     {
         resultsSupplier.setSuccessResult("result");
 
-        TestingMethodInvocationStat stat = statsFactory.getStat("clientService", qualifier, "test");
+        TestingMethodInvocationStat stat = statsFactory.getStat("clientService", qualifier, "test_method");
         stat.clear();
         int invocationId = ThreadLocalRandom.current().nextInt();
         assertEquals(client.test(invocationId, "normal"), "result");
-        verifyMethodInvocation(targets, "test", invocationId, "normal");
+        verifyMethodInvocation(targets, "test_method", invocationId, "normal");
         classifiers.forEach(TestingExceptionClassifier::assertNoException);
         stat.assertSuccess(0);
 
-        stat = statsFactory.getStat("clientService", qualifier, "testAsync");
+        stat = statsFactory.getStat("clientService", qualifier, "test_method");
         stat.clear();
         invocationId = ThreadLocalRandom.current().nextInt();
         assertEquals(client.testAsync(invocationId, "normal").get(), "result");
-        verifyMethodInvocation(targets, "testAsync", invocationId, "normal");
+        verifyMethodInvocation(targets, "test_method", invocationId, "normal");
         classifiers.forEach(TestingExceptionClassifier::assertNoException);
         stat.assertSuccess(0);
 
@@ -387,7 +387,7 @@ public class TestDriftClient
     {
         String name = "exception-" + testException.getClass().getName();
 
-        TestingMethodInvocationStat stat = statsFactory.getStat("clientService", qualifier, "test");
+        TestingMethodInvocationStat stat = statsFactory.getStat("clientService", qualifier, "test_method");
         stat.clear();
         int invocationId = ThreadLocalRandom.current().nextInt();
         resultsSupplier.setFailedResult(testException);
@@ -399,10 +399,10 @@ public class TestDriftClient
             assertExceptionChain(e, testException, expectedWrapperTypes);
             classifiers.forEach(classifier -> classifier.assertLastException(testException));
         }
-        verifyMethodInvocation(targets, "test", invocationId, name);
+        verifyMethodInvocation(targets, "test_method", invocationId, name);
         stat.assertFailure(0);
 
-        stat = statsFactory.getStat("clientService", qualifier, "testAsync");
+        stat = statsFactory.getStat("clientService", qualifier, "test_method");
         stat.clear();
         invocationId = ThreadLocalRandom.current().nextInt();
         resultsSupplier.setFailedResult(testException);
@@ -414,7 +414,7 @@ public class TestDriftClient
             assertExceptionChain(e.getCause(), testException, expectedWrapperTypes);
             classifiers.forEach(classifier -> classifier.assertLastException(testException));
         }
-        verifyMethodInvocation(targets, "testAsync", invocationId, name);
+        verifyMethodInvocation(targets, "test_method", invocationId, name);
         stat.assertFailure(0);
     }
 
@@ -486,7 +486,7 @@ public class TestDriftClient
     @ThriftService("clientService")
     public interface Client
     {
-        @ThriftMethod
+        @ThriftMethod("test_method")
         String test(int id, String name)
                 throws ClientException, TException;
 
@@ -498,7 +498,7 @@ public class TestDriftClient
         String testHeader(@ThriftHeader("headerA") String firstHeader, int id, @ThriftHeader("headerB") String secondHeader, String name)
                 throws ClientException;
 
-        @ThriftMethod(exception = @ThriftException(id = 0, type = ClientException.class))
+        @ThriftMethod(value = "test_method", exception = @ThriftException(id = 0, type = ClientException.class))
         ListenableFuture<String> testAsync(int id, String name);
     }
 

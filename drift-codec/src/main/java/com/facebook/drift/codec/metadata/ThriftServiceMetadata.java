@@ -17,29 +17,31 @@ package com.facebook.drift.codec.metadata;
 
 import com.facebook.drift.annotations.ThriftMethod;
 import com.facebook.drift.annotations.ThriftService;
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.TreeMultimap;
 
 import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Comparators.emptiesLast;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Objects.requireNonNull;
-import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.joining;
 
 @Immutable
 public class ThriftServiceMetadata
 {
     private final String name;
     private final String idlName;
-    private final Map<String, ThriftMethodMetadata> methods;
+    private final List<ThriftMethodMetadata> methods;
     private final List<String> documentation;
 
     public ThriftServiceMetadata(Class<?> serviceClass, ThriftCatalog catalog)
@@ -61,18 +63,16 @@ public class ThriftServiceMetadata
             idlName = thriftService.idlName();
         }
 
-        // A multimap from order to method name. Sorted by key (order), with nulls (i.e. no order) last.
-        // Within each key, values (ThriftMethodMetadata) are sorted by method name.
-        TreeMultimap<Integer, ThriftMethodMetadata> builder = TreeMultimap.create(
-                Ordering.natural().nullsLast(),
-                Ordering.natural().onResultOf(ThriftMethodMetadata::getName));
+        List<OrderedThriftMethodMetadata> methods = new ArrayList<>();
         for (Method method : ReflectionHelper.findAnnotatedMethods(serviceClass, ThriftMethod.class)) {
             if (method.isAnnotationPresent(ThriftMethod.class)) {
-                builder.put(ThriftCatalog.getMethodOrder(method), new ThriftMethodMetadata(method, catalog));
+                methods.add(new OrderedThriftMethodMetadata(new ThriftMethodMetadata(method, catalog), ThriftCatalog.getMethodOrder(method)));
             }
         }
-        methods = builder.values().stream()
-                .collect(toImmutableMap(ThriftMethodMetadata::getName, identity()));
+        methods.sort(null);
+        this.methods = methods.stream()
+                .map(OrderedThriftMethodMetadata::getThriftMethodMetadata)
+                .collect(toImmutableList());
 
         documentation = ThriftCatalog.getThriftDocumentation(serviceClass);
     }
@@ -87,7 +87,7 @@ public class ThriftServiceMetadata
         return idlName;
     }
 
-    public Map<String, ThriftMethodMetadata> getMethods()
+    public List<ThriftMethodMetadata> getMethods()
     {
         return methods;
     }
@@ -124,5 +124,67 @@ public class ThriftServiceMetadata
     public int hashCode()
     {
         return Objects.hash(name, methods);
+    }
+
+    private static class OrderedThriftMethodMetadata
+            implements Comparable<OrderedThriftMethodMetadata>
+    {
+        private final ThriftMethodMetadata thriftMethodMetadata;
+        private final Optional<Integer> order;
+
+        private OrderedThriftMethodMetadata(ThriftMethodMetadata thriftMethodMetadata, Optional<Integer> order)
+        {
+            this.thriftMethodMetadata = requireNonNull(thriftMethodMetadata, "thriftMethodMetadata is null");
+            this.order = requireNonNull(order, "order is null");
+        }
+
+        public ThriftMethodMetadata getThriftMethodMetadata()
+        {
+            return thriftMethodMetadata;
+        }
+
+        public Optional<Integer> getOrder()
+        {
+            return order;
+        }
+
+        @Override
+        public int compareTo(OrderedThriftMethodMetadata that)
+        {
+            return ComparisonChain.start()
+                    .compare(this.order, that.order, emptiesLast(Integer::compareTo))
+                    .compare(this.thriftMethodMetadata.getName(), that.thriftMethodMetadata.getName())
+                    .compare(this.thriftMethodMetadata.getMethod().getName(), that.thriftMethodMetadata.getMethod().getName())
+                    .compare(this.thriftMethodMetadata.getMethod().getParameterTypes(), that.thriftMethodMetadata.getMethod().getParameterTypes(), (left, right) -> {
+                        String leftParameterClassNames = Arrays.stream(left)
+                                .map(Class::getName)
+                                .collect(joining(","));
+                        String rightParameterClassNames = Arrays.stream(right)
+                                .map(Class::getName)
+                                .collect(joining(","));
+                        return leftParameterClassNames.compareTo(rightParameterClassNames);
+                    })
+                    .result();
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            OrderedThriftMethodMetadata that = (OrderedThriftMethodMetadata) o;
+            return Objects.equals(thriftMethodMetadata, that.thriftMethodMetadata) &&
+                    Objects.equals(order, that.order);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return Objects.hash(thriftMethodMetadata, order);
+        }
     }
 }

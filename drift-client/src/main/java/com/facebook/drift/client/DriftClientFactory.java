@@ -111,7 +111,7 @@ public class DriftClientFactory
         Optional<String> qualifier = qualifierAnnotation.map(Class::getSimpleName);
 
         ImmutableMap.Builder<Method, DriftMethodHandler> builder = ImmutableMap.builder();
-        for (ThriftMethodMetadata method : serviceMetadata.getMethods().values()) {
+        for (ThriftMethodMetadata method : serviceMetadata.getMethods()) {
             MethodMetadata metadata = toMethodMetadata(codecManager, method);
 
             RetryPolicy retryPolicy = new RetryPolicy(config, exceptionClassifier);

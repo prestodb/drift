@@ -53,7 +53,7 @@ class DriftServerMethodInvoker
         ImmutableMap.Builder<String, MethodInvocationStat> stats = ImmutableMap.builder();
         for (DriftService service : services) {
             ThriftServiceMetadata serviceMetadata = new ThriftServiceMetadata(service.getService().getClass(), codecManager.getCatalog());
-            for (ThriftMethodMetadata thriftMethodMetadata : serviceMetadata.getMethods().values()) {
+            for (ThriftMethodMetadata thriftMethodMetadata : serviceMetadata.getMethods()) {
                 if (processorMap.containsKey(thriftMethodMetadata.getName())) {
                     throw new IllegalArgumentException(format("Multiple methods named '%s' are annotated with @ThriftMethod in the given services", thriftMethodMetadata.getName()));
                 }

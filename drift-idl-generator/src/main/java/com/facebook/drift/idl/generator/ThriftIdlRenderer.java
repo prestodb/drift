@@ -208,7 +208,7 @@ public final class ThriftIdlRenderer
     {
         return documentation(service.getDocumentation(), "") +
                 format("service %s {\n", service.getIdlName()) +
-                service.getMethods().values().stream()
+                service.getMethods().stream()
                         .map(this::renderMethod)
                         .collect(joining("\n")) +
                 "}\n";

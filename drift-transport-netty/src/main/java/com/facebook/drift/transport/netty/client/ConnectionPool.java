@@ -16,12 +16,14 @@
 package com.facebook.drift.transport.netty.client;
 
 import com.facebook.drift.protocol.TTransportException;
+import com.facebook.drift.transport.netty.throttle.ThrottleLock;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.net.HostAndPort;
 import io.airlift.units.Duration;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
+import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.Future;
 
 import javax.annotation.concurrent.GuardedBy;
@@ -39,6 +41,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 class ConnectionPool
         implements ConnectionManager
 {
+    public static final AttributeKey<ThrottleLock> THROTTLE_LOCK_KEY = AttributeKey.valueOf("throttle.lock.key");
     private final ConnectionManager connectionFactory;
     private final EventLoopGroup group;
 
@@ -108,6 +111,7 @@ class ConnectionPool
         // remove connection from cache when it is closed
         future.addListener(channelFuture -> {
             if (future.isSuccess()) {
+                future.getNow().attr(THROTTLE_LOCK_KEY).set(new ThrottleLock());
                 future.getNow().closeFuture().addListener(closeFuture -> cachedConnections.asMap().remove(key, future));
             }
         });

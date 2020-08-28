@@ -40,7 +40,6 @@ import static com.facebook.drift.transport.netty.codec.Transport.HEADER;
 import static com.facebook.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class DriftNettyMethodInvokerFactory<I>
         implements MethodInvokerFactory<I>, Closeable
@@ -117,7 +116,7 @@ public class DriftNettyMethodInvokerFactory<I>
         }
         finally {
             try {
-                group.shutdownGracefully(0, 0, MILLISECONDS).await();
+                group.shutdownGracefully().await();
             }
             catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

@@ -27,8 +27,7 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TServer.Args;
-import org.apache.thrift.server.TSimpleServer;
+import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
@@ -131,7 +130,7 @@ public class TestClientsWithApacheServer
         }
 
         try (TServerSocket serverSocket = createServerTransport(secure)) {
-            TServer server = new TSimpleServer(new Args(serverSocket)
+            TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverSocket)
                     .protocolFactory(protocolFactory)
                     .transportFactory(transportFactory)
                     .processor(processor));

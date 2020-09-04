@@ -33,6 +33,7 @@ public class DriftNettyConnectionFactoryConfig
 
     private boolean connectionPoolEnabled = true;
     private int connectionPoolMaxSize = 1000;
+    private int connectionPoolMaxConnectionsPerDestination = 1;
     private Duration connectionPoolIdleTimeout = new Duration(1, MINUTES);
 
     private Duration sslContextRefreshTime = new Duration(1, MINUTES);
@@ -60,6 +61,19 @@ public class DriftNettyConnectionFactoryConfig
     public DriftNettyConnectionFactoryConfig setConnectionPoolEnabled(boolean connectionPoolEnabled)
     {
         this.connectionPoolEnabled = connectionPoolEnabled;
+        return this;
+    }
+
+    @Min(1)
+    public int getConnectionPoolMaxConnectionsPerDestination()
+    {
+        return connectionPoolMaxConnectionsPerDestination;
+    }
+
+    @Config("thrift.client.connection-pool.max-connections-per-destination")
+    public DriftNettyConnectionFactoryConfig setConnectionPoolMaxConnectionsPerDestination(int maxConnectionsPerDestination)
+    {
+        this.connectionPoolMaxConnectionsPerDestination = maxConnectionsPerDestination;
         return this;
     }
 

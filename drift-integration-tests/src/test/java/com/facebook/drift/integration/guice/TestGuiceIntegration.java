@@ -27,6 +27,7 @@ import com.facebook.drift.integration.scribe.drift.DriftLogEntry;
 import com.facebook.drift.transport.client.MessageTooLargeException;
 import com.facebook.drift.transport.netty.buffer.TestingPooledByteBufAllocator;
 import com.facebook.drift.transport.netty.client.DriftNettyClientModule;
+import com.facebook.drift.transport.netty.client.DriftNettyConnectionFactoryConfig;
 import com.facebook.drift.transport.netty.server.DriftNettyServerModule;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Injector;
@@ -116,6 +117,7 @@ public class TestGuiceIntegration
         EchoService echoService = injector.getInstance(EchoService.class);
         MismatchService mismatchService = injector.getInstance(MismatchService.class);
         ThrowingService throwingService = injector.getInstance(ThrowingService.class);
+        DriftNettyConnectionFactoryConfig factoryConfig = injector.getInstance(DriftNettyConnectionFactoryConfig.class);
 
         try {
             assertEchoService(echoService);
@@ -123,7 +125,7 @@ public class TestGuiceIntegration
             assertEquals(mismatchService.extraClientArgs(123, 456), 123);
             assertEquals(mismatchService.extraServerArgs(), 42);
 
-            assertThrowingService(throwingService, pooling);
+            assertThrowingService(throwingService, pooling && factoryConfig.getConnectionPoolMaxConnectionsPerDestination() == 1);
         }
         finally {
             lifeCycleManager.stop();
@@ -216,14 +218,14 @@ public class TestGuiceIntegration
         assertThrows(EmptyOptionalException.class, () -> service.echoOptionalListString(null));
     }
 
-    private static void assertThrowingService(ThrowingService service, boolean pooling)
+    private static void assertThrowingService(ThrowingService service, boolean singleConnection)
     {
         // make sure requests work after sending and receiving too large frame
         receiveTooLargeMessage(service);
         sendTooLargeMessage(service);
 
         // test that too large frame failures doesn't cause the failure of other requests on the same channel
-        if (pooling) {
+        if (singleConnection) {
             ListenableFuture<String> awaitFuture = service.await();
             assertFalse(awaitFuture.isDone());
             receiveTooLargeMessage(service);

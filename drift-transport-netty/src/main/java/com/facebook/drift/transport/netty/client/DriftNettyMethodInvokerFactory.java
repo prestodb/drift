@@ -90,7 +90,12 @@ public class DriftNettyMethodInvokerFactory<I>
 
         ConnectionManager connectionManager = new ConnectionFactory(group, sslContextFactory, allocator, factoryConfig);
         if (factoryConfig.isConnectionPoolEnabled()) {
-            connectionManager = new ConnectionPool(connectionManager, group, factoryConfig.getConnectionPoolMaxSize(), factoryConfig.getConnectionPoolIdleTimeout());
+            connectionManager = new ConnectionPool(
+                    connectionManager,
+                    group,
+                    factoryConfig.getConnectionPoolMaxSize(),
+                    factoryConfig.getConnectionPoolMaxConnectionsPerDestination(),
+                    factoryConfig.getConnectionPoolIdleTimeout());
         }
         this.connectionManager = connectionManager;
     }

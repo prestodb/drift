@@ -29,6 +29,7 @@ import javax.annotation.concurrent.GuardedBy;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import static com.facebook.airlift.concurrent.Threads.daemonThreadsNamed;
@@ -41,6 +42,7 @@ class ConnectionPool
 {
     private final ConnectionManager connectionFactory;
     private final EventLoopGroup group;
+    private final int maxConnectionsPerDestination;
 
     private final Cache<ConnectionKey, Future<Channel>> cachedConnections;
 
@@ -50,10 +52,16 @@ class ConnectionPool
     @GuardedBy("this")
     private boolean closed;
 
-    public ConnectionPool(ConnectionManager connectionFactory, EventLoopGroup group, int maxSize, Duration idleTimeout)
+    public ConnectionPool(
+            ConnectionManager connectionFactory,
+            EventLoopGroup group,
+            int maxSize,
+            int maxConnectionsPerDestination,
+            Duration idleTimeout)
     {
         this.connectionFactory = requireNonNull(connectionFactory, "connectionFactory is null");
         this.group = requireNonNull(group, "group is null");
+        this.maxConnectionsPerDestination = maxConnectionsPerDestination;
 
         cachedConnections = CacheBuilder.newBuilder()
                 .maximumSize(maxSize)
@@ -67,7 +75,7 @@ class ConnectionPool
     @Override
     public Future<Channel> getConnection(ConnectionParameters connectionParameters, HostAndPort address)
     {
-        ConnectionKey key = new ConnectionKey(connectionParameters, address);
+        ConnectionKey key = new ConnectionKey(connectionParameters, address, getRandomConnectionId());
 
         while (true) {
             synchronized (this) {
@@ -146,15 +154,25 @@ class ConnectionPool
         });
     }
 
+    private int getRandomConnectionId()
+    {
+        return maxConnectionsPerDestination == 1 ? 0 : ThreadLocalRandom.current().nextInt(maxConnectionsPerDestination);
+    }
+
     private static class ConnectionKey
     {
         private final ConnectionParameters connectionParameters;
         private final HostAndPort address;
+        private final int connectionId;
 
-        public ConnectionKey(ConnectionParameters connectionParameters, HostAndPort address)
+        public ConnectionKey(
+                ConnectionParameters connectionParameters,
+                HostAndPort address,
+                int connectionId)
         {
             this.connectionParameters = connectionParameters;
             this.address = address;
+            this.connectionId = connectionId;
         }
 
         public ConnectionParameters getConnectionParameters()
@@ -178,13 +196,14 @@ class ConnectionPool
             }
             ConnectionKey that = (ConnectionKey) o;
             return Objects.equals(connectionParameters, that.connectionParameters) &&
-                    Objects.equals(address, that.address);
+                    Objects.equals(address, that.address) &&
+                    connectionId == that.connectionId;
         }
 
         @Override
         public int hashCode()
         {
-            return Objects.hash(connectionParameters, address);
+            return Objects.hash(connectionParameters, address, connectionId);
         }
     }
 }

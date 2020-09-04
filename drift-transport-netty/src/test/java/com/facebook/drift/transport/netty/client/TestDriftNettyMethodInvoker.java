@@ -62,8 +62,7 @@ import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TServer.Args;
-import org.apache.thrift.server.TSimpleServer;
+import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TNonblockingSocket;
 import org.apache.thrift.transport.TServerSocket;
@@ -149,7 +148,7 @@ public class TestDriftNettyMethodInvoker
         try (TServerSocket serverTransport = new TServerSocket(0)) {
             TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
             TTransportFactory transportFactory = new TFramedTransport.Factory();
-            TServer server = new TSimpleServer(new Args(serverTransport)
+            TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport)
                     .protocolFactory(protocolFactory)
                     .transportFactory(transportFactory)
                     .processor(processor));

@@ -42,9 +42,9 @@ public class TestConnectionPool
     private static final ConnectionParameters PARAMETERS = new ConnectionParameters(HEADER, FB_COMPACT, new DataSize(1, MEGABYTE), new Duration(1, MINUTES), new Duration(1, MINUTES), Optional.empty(), Optional.empty());
 
     @Test
-    public void testPooling()
+    public void testPoolingWithSingleConnection()
     {
-        try (ConnectionPool pool = new ConnectionPool(new TestingConnectionManager(), new DefaultEventLoopGroup(), 10, new Duration(1, MINUTES))) {
+        try (ConnectionPool pool = new ConnectionPool(new TestingConnectionManager(), new DefaultEventLoopGroup(), 10, 1, new Duration(1, MINUTES))) {
             HostAndPort address1 = HostAndPort.fromParts("localhost", 1234);
             HostAndPort address2 = HostAndPort.fromParts("localhost", 4567);
 
@@ -61,9 +61,20 @@ public class TestConnectionPool
     }
 
     @Test
+    public void testPoolingWithMultipleConnections()
+    {
+        try (ConnectionPool pool = new ConnectionPool(new TestingConnectionManager(), new DefaultEventLoopGroup(), 10, 2, new Duration(1, MINUTES))) {
+            HostAndPort address = HostAndPort.fromParts("localhost", 1234);
+
+            futureGet(pool.getConnection(PARAMETERS, address));
+            futureGet(pool.getConnection(PARAMETERS, address));
+        }
+    }
+
+    @Test
     public void testConnectionClosed()
     {
-        try (ConnectionPool pool = new ConnectionPool(new TestingConnectionManager(), new DefaultEventLoopGroup(), 10, new Duration(1, MINUTES))) {
+        try (ConnectionPool pool = new ConnectionPool(new TestingConnectionManager(), new DefaultEventLoopGroup(), 10, 1, new Duration(1, MINUTES))) {
             HostAndPort address = HostAndPort.fromParts("localhost", 1234);
 
             Channel channel1 = futureGet(pool.getConnection(PARAMETERS, address));

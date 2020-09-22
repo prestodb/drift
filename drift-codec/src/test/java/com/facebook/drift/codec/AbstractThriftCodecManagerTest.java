@@ -55,6 +55,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -290,6 +291,38 @@ public abstract class AbstractThriftCodecManagerTest
                 ImmutableMap.of((short) 1, new double[] {40, 41, 42, 43}, (short) 2, new double[] {45, 46, 47, 48}));
 
         testRoundTripSerialize(arrayField, TCompactProtocol::new);
+    }
+
+    @Test
+    public void testUri()
+            throws Exception
+    {
+        UriField uriField = new UriField(URI.create("http://fake.uri"));
+        testRoundTripSerialize(uriField);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testUriInvalid()
+            throws Exception
+    {
+        UriField uriField = new UriField(URI.create(">fake"));
+        testRoundTripSerialize(uriField);
+    }
+
+    @Test
+    public void testUriFile()
+            throws Exception
+    {
+        UriField uriField = new UriField(URI.create("file://host/path"));
+        testRoundTripSerialize(uriField);
+    }
+
+    @Test
+    public void testUriMailTo()
+            throws Exception
+    {
+        UriField uriField = new UriField(URI.create("mailto:someone@example.com"));
+        testRoundTripSerialize(uriField);
     }
 
     @Test

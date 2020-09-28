@@ -1,0 +1,3 @@
+struct URIField {
+  1: string uri;
+}

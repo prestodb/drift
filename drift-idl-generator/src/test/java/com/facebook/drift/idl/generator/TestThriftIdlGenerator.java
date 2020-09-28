@@ -37,6 +37,7 @@ public class TestThriftIdlGenerator
         assertGenerated(DriftScribe.class, "scribe", ignored -> {});
         assertGenerated(RenamedService.class, "renamed", ignored -> {});
         assertGenerated(Fruit.class, "fruit", ignored -> {});
+        assertGenerated(URIField.class, "uri", ignored -> {});
         assertGenerated(TreeNode.class, "tree", ignored -> {});
 
         assertGenerated(Point.class, "point", config -> config

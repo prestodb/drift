@@ -35,6 +35,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +63,7 @@ public class ThriftIdlGenerator
             .add(ThriftType.I64)
             .add(ThriftType.DOUBLE)
             .add(ThriftType.STRING)
+            .add(new ThriftType(ThriftType.STRING, URI.class))
             .add(ThriftType.BINARY)
             .add(new ThriftType(ThriftType.BOOL, Boolean.class))
             .add(new ThriftType(ThriftType.BYTE, Byte.class))

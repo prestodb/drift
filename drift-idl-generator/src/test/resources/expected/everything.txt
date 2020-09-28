@@ -18,6 +18,10 @@ union Combined {
   3: fruit.Fruit fruitValue;
 }
 
+struct URIField {
+  1: string uri;
+}
+
 struct OneOfEverything {
   1: bool aBoolean;
   2: byte aByte;
@@ -77,4 +81,5 @@ struct OneOfEverything {
   70: binary aByteArray;
   100: set<list<map<string, Bonk>>> aSetOfListsOfMaps;
   101: map<list<string>, set<Bonk>> aMapOfListToSet;
+  102: URIField uriField;
 }

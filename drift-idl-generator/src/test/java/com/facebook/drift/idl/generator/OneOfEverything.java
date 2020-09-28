@@ -148,4 +148,6 @@ public final class OneOfEverything
     public Set<List<Map<String, BonkField>>> aSetOfListsOfMaps;
     @ThriftField(101)
     public Map<List<String>, Set<BonkField>> aMapOfListToSet;
+    @ThriftField(102)
+    public URIField uriField;
 }

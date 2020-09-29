@@ -32,9 +32,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-import static com.facebook.airlift.concurrent.Threads.daemonThreadsNamed;
 import static java.util.Objects.requireNonNull;
-import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 class ConnectionPool
@@ -46,9 +44,6 @@ class ConnectionPool
 
     private final Cache<ConnectionKey, Future<Channel>> cachedConnections;
 
-    private final ScheduledExecutorService maintenanceThread =
-            newSingleThreadScheduledExecutor(daemonThreadsNamed("drift-connection-maintenance"));
-
     @GuardedBy("this")
     private boolean closed;
 
@@ -57,7 +52,8 @@ class ConnectionPool
             EventLoopGroup group,
             int maxSize,
             int maxConnectionsPerDestination,
-            Duration idleTimeout)
+            Duration idleTimeout,
+            ScheduledExecutorService scheduledExecutorService)
     {
         this.connectionFactory = requireNonNull(connectionFactory, "connectionFactory is null");
         this.group = requireNonNull(group, "group is null");
@@ -69,7 +65,7 @@ class ConnectionPool
                 .<ConnectionKey, Future<Channel>>removalListener(notification -> closeConnection(notification.getValue()))
                 .build();
 
-        maintenanceThread.scheduleWithFixedDelay(cachedConnections::cleanUp, 1, 1, TimeUnit.SECONDS);
+        scheduledExecutorService.scheduleWithFixedDelay(cachedConnections::cleanUp, 1, 1, TimeUnit.SECONDS);
     }
 
     @Override
@@ -136,12 +132,7 @@ class ConnectionPool
         }
         closed = true;
 
-        try {
-            cachedConnections.invalidateAll();
-        }
-        finally {
-            maintenanceThread.shutdownNow();
-        }
+        cachedConnections.invalidateAll();
     }
 
     private static void closeConnection(Future<Channel> future)

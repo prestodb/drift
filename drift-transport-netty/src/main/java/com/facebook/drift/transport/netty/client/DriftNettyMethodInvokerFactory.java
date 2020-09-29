@@ -32,6 +32,7 @@ import javax.annotation.PreDestroy;
 
 import java.io.Closeable;
 import java.util.Optional;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 import static com.facebook.airlift.concurrent.Threads.daemonThreadsNamed;
@@ -40,6 +41,7 @@ import static com.facebook.drift.transport.netty.codec.Transport.HEADER;
 import static com.facebook.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
 public class DriftNettyMethodInvokerFactory<I>
         implements MethodInvokerFactory<I>, Closeable
@@ -50,6 +52,7 @@ public class DriftNettyMethodInvokerFactory<I>
     private final SslContextFactory sslContextFactory;
     private final Optional<HostAndPort> defaultSocksProxy;
     private final ConnectionManager connectionManager;
+    private final ScheduledExecutorService connectionPoolMaintenanceExecutor;
 
     public static DriftNettyMethodInvokerFactory<?> createStaticDriftNettyMethodInvokerFactory(DriftNettyClientConfig clientConfig)
     {
@@ -88,6 +91,8 @@ public class DriftNettyMethodInvokerFactory<I>
         this.sslContextFactory = createSslContextFactory(true, factoryConfig.getSslContextRefreshTime(), group);
         this.defaultSocksProxy = Optional.ofNullable(factoryConfig.getSocksProxy());
 
+        connectionPoolMaintenanceExecutor = newSingleThreadScheduledExecutor(daemonThreadsNamed("drift-connection-maintenance"));
+
         ConnectionManager connectionManager = new ConnectionFactory(group, sslContextFactory, allocator, factoryConfig);
         if (factoryConfig.isConnectionPoolEnabled()) {
             connectionManager = new ConnectionPool(
@@ -95,7 +100,8 @@ public class DriftNettyMethodInvokerFactory<I>
                     group,
                     factoryConfig.getConnectionPoolMaxSize(),
                     factoryConfig.getConnectionPoolMaxConnectionsPerDestination(),
-                    factoryConfig.getConnectionPoolIdleTimeout());
+                    factoryConfig.getConnectionPoolIdleTimeout(),
+                    connectionPoolMaintenanceExecutor);
         }
         this.connectionManager = connectionManager;
     }
@@ -120,6 +126,7 @@ public class DriftNettyMethodInvokerFactory<I>
             connectionManager.close();
         }
         finally {
+            connectionPoolMaintenanceExecutor.shutdownNow();
             try {
                 group.shutdownGracefully().await();
             }

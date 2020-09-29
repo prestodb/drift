@@ -24,13 +24,18 @@ import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.ImmediateEventExecutor;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.Optional;
+import java.util.concurrent.ScheduledExecutorService;
 
+import static com.facebook.airlift.concurrent.Threads.daemonThreadsNamed;
 import static com.facebook.drift.transport.netty.codec.Protocol.FB_COMPACT;
 import static com.facebook.drift.transport.netty.codec.Transport.HEADER;
 import static io.airlift.units.DataSize.Unit.MEGABYTE;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotSame;
@@ -41,10 +46,29 @@ public class TestConnectionPool
 {
     private static final ConnectionParameters PARAMETERS = new ConnectionParameters(HEADER, FB_COMPACT, new DataSize(1, MEGABYTE), new Duration(1, MINUTES), new Duration(1, MINUTES), Optional.empty(), Optional.empty());
 
+    private ScheduledExecutorService scheduledExecutorService;
+
+    @BeforeClass
+    public void setup()
+    {
+        scheduledExecutorService = newSingleThreadScheduledExecutor(daemonThreadsNamed("drift-connection-maintenance"));
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void teardown()
+            throws InterruptedException
+    {
+        if (scheduledExecutorService != null) {
+            scheduledExecutorService.shutdownNow();
+            scheduledExecutorService.awaitTermination(1, MINUTES);
+            scheduledExecutorService = null;
+        }
+    }
+
     @Test
     public void testPoolingWithSingleConnection()
     {
-        try (ConnectionPool pool = new ConnectionPool(new TestingConnectionManager(), new DefaultEventLoopGroup(), 10, 1, new Duration(1, MINUTES))) {
+        try (ConnectionPool pool = new ConnectionPool(new TestingConnectionManager(), new DefaultEventLoopGroup(), 10, 1, new Duration(1, MINUTES), scheduledExecutorService)) {
             HostAndPort address1 = HostAndPort.fromParts("localhost", 1234);
             HostAndPort address2 = HostAndPort.fromParts("localhost", 4567);
 
@@ -63,7 +87,7 @@ public class TestConnectionPool
     @Test
     public void testPoolingWithMultipleConnections()
     {
-        try (ConnectionPool pool = new ConnectionPool(new TestingConnectionManager(), new DefaultEventLoopGroup(), 10, 2, new Duration(1, MINUTES))) {
+        try (ConnectionPool pool = new ConnectionPool(new TestingConnectionManager(), new DefaultEventLoopGroup(), 10, 2, new Duration(1, MINUTES), scheduledExecutorService)) {
             HostAndPort address = HostAndPort.fromParts("localhost", 1234);
 
             futureGet(pool.getConnection(PARAMETERS, address));
@@ -74,7 +98,7 @@ public class TestConnectionPool
     @Test
     public void testConnectionClosed()
     {
-        try (ConnectionPool pool = new ConnectionPool(new TestingConnectionManager(), new DefaultEventLoopGroup(), 10, 1, new Duration(1, MINUTES))) {
+        try (ConnectionPool pool = new ConnectionPool(new TestingConnectionManager(), new DefaultEventLoopGroup(), 10, 1, new Duration(1, MINUTES), scheduledExecutorService)) {
             HostAndPort address = HostAndPort.fromParts("localhost", 1234);
 
             Channel channel1 = futureGet(pool.getConnection(PARAMETERS, address));

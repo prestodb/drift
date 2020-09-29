@@ -56,7 +56,11 @@ public class TestDriftNettyClientConfig
                 .setKeyPassword(null)
                 .setSessionCacheSize(10_000)
                 .setSessionTimeout(new Duration(1, DAYS))
-                .setCiphers(""));
+                .setCiphers("")
+                .setConnectionPoolEnabled(null)
+                .setConnectionPoolMaxConnectionsPerDestination(null)
+                .setConnectionPoolMaxSize(null)
+                .setConnectionPoolIdleTimeout(null));
     }
 
     @Test
@@ -76,6 +80,10 @@ public class TestDriftNettyClientConfig
                 .put("thrift.client.ssl.session-cache-size", "678")
                 .put("thrift.client.ssl.session-timeout", "78h")
                 .put("thrift.client.ssl.ciphers", "some_cipher")
+                .put("thrift.client.connection-pool.enabled", "true")
+                .put("thrift.client.connection-pool.max-connections-per-destination", "123")
+                .put("thrift.client.connection-pool.max-size", "321")
+                .put("thrift.client.connection-pool.idle-timeout", "12m")
                 .build();
 
         DriftNettyClientConfig expected = new DriftNettyClientConfig()
@@ -91,7 +99,11 @@ public class TestDriftNettyClientConfig
                 .setKeyPassword("key_password")
                 .setSessionCacheSize(678)
                 .setSessionTimeout(new Duration(78, HOURS))
-                .setCiphers("some_cipher");
+                .setCiphers("some_cipher")
+                .setConnectionPoolEnabled(true)
+                .setConnectionPoolMaxConnectionsPerDestination(123)
+                .setConnectionPoolMaxSize(321)
+                .setConnectionPoolIdleTimeout(new Duration(12, MINUTES));
 
         assertFullMapping(properties, expected);
     }

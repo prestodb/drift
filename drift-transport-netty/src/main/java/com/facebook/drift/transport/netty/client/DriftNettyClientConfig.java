@@ -26,6 +26,7 @@ import io.airlift.units.Duration;
 import io.airlift.units.MaxDataSize;
 import io.airlift.units.MinDuration;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import java.io.File;
@@ -58,6 +59,11 @@ public class DriftNettyClientConfig
     private String keyPassword;
     private long sessionCacheSize = 10_000;
     private Duration sessionTimeout = new Duration(1, DAYS);
+
+    private Boolean connectionPoolEnabled;
+    private Integer connectionPoolMaxSize;
+    private Integer connectionPoolMaxConnectionsPerDestination;
+    private Duration connectionPoolIdleTimeout;
 
     @NotNull
     public Transport getTransport()
@@ -223,6 +229,57 @@ public class DriftNettyClientConfig
                 .trimResults()
                 .omitEmptyStrings()
                 .splitToList(requireNonNull(ciphers, "ciphers is null"));
+        return this;
+    }
+
+    public Boolean getConnectionPoolEnabled()
+    {
+        return connectionPoolEnabled;
+    }
+
+    @Config("thrift.client.connection-pool.enabled")
+    public DriftNettyClientConfig setConnectionPoolEnabled(Boolean connectionPoolEnabled)
+    {
+        this.connectionPoolEnabled = connectionPoolEnabled;
+        return this;
+    }
+
+    @Min(1)
+    public Integer getConnectionPoolMaxConnectionsPerDestination()
+    {
+        return connectionPoolMaxConnectionsPerDestination;
+    }
+
+    @Config("thrift.client.connection-pool.max-connections-per-destination")
+    public DriftNettyClientConfig setConnectionPoolMaxConnectionsPerDestination(Integer maxConnectionsPerDestination)
+    {
+        this.connectionPoolMaxConnectionsPerDestination = maxConnectionsPerDestination;
+        return this;
+    }
+
+    @Min(1)
+    public Integer getConnectionPoolMaxSize()
+    {
+        return connectionPoolMaxSize;
+    }
+
+    @Config("thrift.client.connection-pool.max-size")
+    public DriftNettyClientConfig setConnectionPoolMaxSize(Integer connectionPoolMaxSize)
+    {
+        this.connectionPoolMaxSize = connectionPoolMaxSize;
+        return this;
+    }
+
+    @MinDuration("1s")
+    public Duration getConnectionPoolIdleTimeout()
+    {
+        return connectionPoolIdleTimeout;
+    }
+
+    @Config("thrift.client.connection-pool.idle-timeout")
+    public DriftNettyClientConfig setConnectionPoolIdleTimeout(Duration connectionPoolIdleTimeout)
+    {
+        this.connectionPoolIdleTimeout = connectionPoolIdleTimeout;
         return this;
     }
 }

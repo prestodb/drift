@@ -55,7 +55,7 @@ public class IdlGeneratorMojo
     /**
      * Drift classes to process.
      */
-    @Parameter(required = true)
+    @Parameter(property = "generate.thrift.idl.classes", required = true)
     private List<String> classes;
 
     /**
@@ -67,7 +67,7 @@ public class IdlGeneratorMojo
     /**
      * Output file for the generated Thrift IDL.
      */
-    @Parameter(required = true)
+    @Parameter(property = "generate.thrift.idl.outputFile", required = true)
     private File outputFile;
 
     /**
@@ -90,7 +90,7 @@ public class IdlGeneratorMojo
      * If this option is false, any dependent types not specified as class
      * names will need to be specified in the includes mapping.
      */
-    @Parameter(required = true)
+    @Parameter(property = "generate.thrift.idl.recursive", required = true)
     private boolean recursive;
 
     /**

@@ -72,7 +72,9 @@ class InvocationResponseFuture
                     connectionParameters.getConnectTimeout(),
                     connectionParameters.getRequestTimeout(),
                     connectionParameters.getSocksProxy(),
-                    Optional.empty());
+                    Optional.empty(),
+                    connectionParameters.isTcpNoDelayEnabled(),
+                    connectionParameters.isReuseAddressEnabled());
         }
 
         InvocationResponseFuture future = new InvocationResponseFuture(request, connectionParameters, connectionManager);

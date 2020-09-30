@@ -184,6 +184,8 @@ public class DriftNettyMethodInvokerFactory<I>
                 clientConfig.getConnectTimeout(),
                 clientConfig.getRequestTimeout(),
                 socksProxy,
-                sslContextConfig);
+                sslContextConfig,
+                clientConfig.isTcpNoDelayEnabled(),
+                clientConfig.isReuseAddressEnabled());
     }
 }

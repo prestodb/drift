@@ -52,6 +52,9 @@ interface ConnectionManager
         private final Optional<HostAndPort> socksProxy;
         private final Optional<SslContextParameters> sslContextParameters;
 
+        private final boolean tcpNoDelayEnabled;
+        private final boolean reuseAddressEnabled;
+
         public ConnectionParameters(
                 Transport transport,
                 Protocol protocol,
@@ -59,7 +62,9 @@ interface ConnectionManager
                 Duration connectTimeout,
                 Duration requestTimeout,
                 Optional<HostAndPort> socksProxy,
-                Optional<SslContextParameters> sslContextParameters)
+                Optional<SslContextParameters> sslContextParameters,
+                boolean tcpNoDelayEnabled,
+                boolean reuseAddressEnabled)
         {
             this.transport = requireNonNull(transport, "transport is null");
             this.protocol = requireNonNull(protocol, "protocol is null");
@@ -68,6 +73,8 @@ interface ConnectionManager
             this.requestTimeout = requireNonNull(requestTimeout, "requestTimeout is null");
             this.socksProxy = requireNonNull(socksProxy, "socksProxy is null");
             this.sslContextParameters = requireNonNull(sslContextParameters, "sslContextParameters is null");
+            this.tcpNoDelayEnabled = tcpNoDelayEnabled;
+            this.reuseAddressEnabled = reuseAddressEnabled;
         }
 
         public Transport getTransport()
@@ -105,6 +112,16 @@ interface ConnectionManager
             return sslContextParameters;
         }
 
+        public boolean isTcpNoDelayEnabled()
+        {
+            return tcpNoDelayEnabled;
+        }
+
+        public boolean isReuseAddressEnabled()
+        {
+            return reuseAddressEnabled;
+        }
+
         @Override
         public boolean equals(Object o)
         {
@@ -121,13 +138,24 @@ interface ConnectionManager
                     Objects.equals(connectTimeout, that.connectTimeout) &&
                     Objects.equals(requestTimeout, that.requestTimeout) &&
                     Objects.equals(socksProxy, that.socksProxy) &&
-                    Objects.equals(sslContextParameters, that.sslContextParameters);
+                    Objects.equals(sslContextParameters, that.sslContextParameters) &&
+                    tcpNoDelayEnabled == that.tcpNoDelayEnabled &&
+                    reuseAddressEnabled == that.reuseAddressEnabled;
         }
 
         @Override
         public int hashCode()
         {
-            return Objects.hash(transport, protocol, maxFrameSize, connectTimeout, requestTimeout, socksProxy, sslContextParameters);
+            return Objects.hash(
+                    transport,
+                    protocol,
+                    maxFrameSize,
+                    connectTimeout,
+                    requestTimeout,
+                    socksProxy,
+                    sslContextParameters,
+                    tcpNoDelayEnabled,
+                    reuseAddressEnabled);
         }
     }
 }

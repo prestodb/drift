@@ -60,7 +60,9 @@ public class TestDriftNettyClientConfig
                 .setConnectionPoolEnabled(null)
                 .setConnectionPoolMaxConnectionsPerDestination(null)
                 .setConnectionPoolMaxSize(null)
-                .setConnectionPoolIdleTimeout(null));
+                .setConnectionPoolIdleTimeout(null)
+                .setTcpNoDelayEnabled(false)
+                .setReuseAddressEnabled(false));
     }
 
     @Test
@@ -84,6 +86,8 @@ public class TestDriftNettyClientConfig
                 .put("thrift.client.connection-pool.max-connections-per-destination", "123")
                 .put("thrift.client.connection-pool.max-size", "321")
                 .put("thrift.client.connection-pool.idle-timeout", "12m")
+                .put("thrift.client.tcp-no-delay.enabled", "true")
+                .put("thrift.client.reuse-address.enabled", "true")
                 .build();
 
         DriftNettyClientConfig expected = new DriftNettyClientConfig()
@@ -103,7 +107,9 @@ public class TestDriftNettyClientConfig
                 .setConnectionPoolEnabled(true)
                 .setConnectionPoolMaxConnectionsPerDestination(123)
                 .setConnectionPoolMaxSize(321)
-                .setConnectionPoolIdleTimeout(new Duration(12, MINUTES));
+                .setConnectionPoolIdleTimeout(new Duration(12, MINUTES))
+                .setTcpNoDelayEnabled(true)
+                .setReuseAddressEnabled(true);
 
         assertFullMapping(properties, expected);
     }

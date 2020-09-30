@@ -36,6 +36,8 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.primitives.Ints.saturatedCast;
 import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
+import static io.netty.channel.ChannelOption.SO_REUSEADDR;
+import static io.netty.channel.ChannelOption.TCP_NODELAY;
 import static java.util.Objects.requireNonNull;
 
 class ConnectionFactory
@@ -73,6 +75,8 @@ class ConnectionFactory
                     .channel(socketChannelClass)
                     .option(ALLOCATOR, allocator)
                     .option(CONNECT_TIMEOUT_MILLIS, saturatedCast(connectionParameters.getConnectTimeout().toMillis()))
+                    .option(TCP_NODELAY, connectionParameters.isTcpNoDelayEnabled())
+                    .option(SO_REUSEADDR, connectionParameters.isReuseAddressEnabled())
                     .handler(new ThriftClientInitializer(
                             connectionParameters.getTransport(),
                             connectionParameters.getProtocol(),

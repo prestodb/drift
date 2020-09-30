@@ -44,7 +44,7 @@ import static org.testng.Assert.assertTrue;
 
 public class TestConnectionPool
 {
-    private static final ConnectionParameters PARAMETERS = new ConnectionParameters(HEADER, FB_COMPACT, new DataSize(1, MEGABYTE), new Duration(1, MINUTES), new Duration(1, MINUTES), Optional.empty(), Optional.empty());
+    private static final ConnectionParameters PARAMETERS = new ConnectionParameters(HEADER, FB_COMPACT, new DataSize(1, MEGABYTE), new Duration(1, MINUTES), new Duration(1, MINUTES), Optional.empty(), Optional.empty(), false, false);
 
     private ScheduledExecutorService scheduledExecutorService;
 

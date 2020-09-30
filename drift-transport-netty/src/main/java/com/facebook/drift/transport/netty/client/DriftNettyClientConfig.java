@@ -65,6 +65,9 @@ public class DriftNettyClientConfig
     private Integer connectionPoolMaxConnectionsPerDestination;
     private Duration connectionPoolIdleTimeout;
 
+    private boolean tcpNoDelayEnabled;
+    private boolean reuseAddressEnabled;
+
     @NotNull
     public Transport getTransport()
     {
@@ -280,6 +283,30 @@ public class DriftNettyClientConfig
     public DriftNettyClientConfig setConnectionPoolIdleTimeout(Duration connectionPoolIdleTimeout)
     {
         this.connectionPoolIdleTimeout = connectionPoolIdleTimeout;
+        return this;
+    }
+
+    public boolean isTcpNoDelayEnabled()
+    {
+        return tcpNoDelayEnabled;
+    }
+
+    @Config("thrift.client.tcp-no-delay.enabled")
+    public DriftNettyClientConfig setTcpNoDelayEnabled(boolean tcpNoDelayEnabled)
+    {
+        this.tcpNoDelayEnabled = tcpNoDelayEnabled;
+        return this;
+    }
+
+    public boolean isReuseAddressEnabled()
+    {
+        return reuseAddressEnabled;
+    }
+
+    @Config("thrift.client.reuse-address.enabled")
+    public DriftNettyClientConfig setReuseAddressEnabled(boolean reuseAddressEnabled)
+    {
+        this.reuseAddressEnabled = reuseAddressEnabled;
         return this;
     }
 }

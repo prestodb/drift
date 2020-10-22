@@ -15,13 +15,13 @@
  */
 package com.facebook.drift.codec.internal.compiler;
 
+import com.facebook.airlift.bytecode.DynamicClassLoader;
 import com.facebook.drift.codec.ThriftCodec;
 import com.facebook.drift.codec.ThriftCodecManager;
 import com.facebook.drift.codec.internal.ForCompiler;
 import com.facebook.drift.codec.internal.ThriftCodecFactory;
 import com.facebook.drift.codec.metadata.ThriftStructMetadata;
 import com.google.inject.Inject;
-import io.airlift.bytecode.DynamicClassLoader;
 
 import javax.annotation.concurrent.Immutable;
 

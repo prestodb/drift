@@ -23,6 +23,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.flow.FlowControlHandler;
 
 import java.util.List;
 import java.util.Optional;
@@ -136,6 +137,7 @@ public class ThriftProtocolDetection
     {
         ChannelPipeline pipeline = context.pipeline();
         transport.addFrameHandlers(pipeline, protocol, maxFrameSize, assumeClientsSupportOutOfOrderResponses);
+        pipeline.addLast(new FlowControlHandler());
         pipeline.addLast(new ResponseOrderingHandler());
         pipeline.addLast(thriftServerHandler);
 

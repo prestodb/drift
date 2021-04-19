@@ -308,7 +308,7 @@ class DriftMethodInvocation<A extends Address>
                             unexpectedError(t);
                         }
                     },
-                    directExecutor());
+                    retryService);
         }
         catch (Throwable t) {
             // this should never happen, but ensure that invocation always finishes

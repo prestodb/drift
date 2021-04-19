@@ -61,6 +61,7 @@ import static com.facebook.drift.client.guice.DriftClientBinder.driftClientBinde
 import static com.facebook.drift.client.guice.MethodInvocationFilterBinder.staticFilterBinder;
 import static com.google.common.base.Throwables.getCausalChain;
 import static com.google.common.base.Throwables.getRootCause;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
 import static java.lang.annotation.ElementType.FIELD;
@@ -92,7 +93,7 @@ public class TestDriftClient
         TestingMethodInvocationStatsFactory statsFactory = new TestingMethodInvocationStatsFactory();
         List<TestingExceptionClassifier> classifiers = ImmutableList.of(new TestingExceptionClassifier(), new TestingExceptionClassifier(), new TestingExceptionClassifier());
 
-        DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(codecManager, methodInvokerFactory, statsFactory);
+        DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(codecManager, methodInvokerFactory, statsFactory, directExecutor());
         DriftClientFactory driftClientFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", new MockAddressSelector(), mergeExceptionClassifiers(classifiers));
 
         DriftClient<Client> driftClient = driftClientFactory.createDriftClient(Client.class, Optional.empty(), ImmutableList.of(), new DriftClientConfig());
@@ -114,7 +115,7 @@ public class TestDriftClient
         TestingMethodInvocationStatsFactory statsFactory = new TestingMethodInvocationStatsFactory();
         List<TestingExceptionClassifier> classifiers = ImmutableList.of(new TestingExceptionClassifier(), new TestingExceptionClassifier(), new TestingExceptionClassifier());
 
-        DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(codecManager, invokerFactory, statsFactory);
+        DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(codecManager, invokerFactory, statsFactory, directExecutor());
         DriftClientFactory driftClientFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", new MockAddressSelector(), mergeExceptionClassifiers(classifiers));
 
         DriftClient<Client> driftClient = driftClientFactory.createDriftClient(

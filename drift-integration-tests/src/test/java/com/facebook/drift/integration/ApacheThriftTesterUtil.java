@@ -45,6 +45,7 @@ import static com.facebook.drift.integration.ClientTestUtils.logDriftClientBinde
 import static com.facebook.drift.transport.apache.client.ApacheThriftMethodInvokerFactory.createStaticApacheThriftMethodInvokerFactory;
 import static com.facebook.drift.transport.netty.codec.Protocol.FB_COMPACT;
 import static com.facebook.drift.transport.netty.codec.Transport.HEADER;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.testng.Assert.assertEquals;
 
 final class ApacheThriftTesterUtil
@@ -81,7 +82,7 @@ final class ApacheThriftTesterUtil
                 .setSslEnabled(secure);
         ApacheThriftConnectionFactoryConfig factoryConfig = new ApacheThriftConnectionFactoryConfig();
         try (ApacheThriftMethodInvokerFactory<String> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, clientIdentity -> config)) {
-            DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
+            DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory, directExecutor());
             DriftClientFactory proxyFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", addressSelector, NORMAL_RESULT);
 
             DriftScribe scribe = proxyFactory.createDriftClient(DriftScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
@@ -115,7 +116,7 @@ final class ApacheThriftTesterUtil
                 .setSslEnabled(secure);
 
         try (ApacheThriftMethodInvokerFactory<?> methodInvokerFactory = createStaticApacheThriftMethodInvokerFactory(config)) {
-            DriftClientFactory proxyFactory = new DriftClientFactory(CODEC_MANAGER, methodInvokerFactory, addressSelector);
+            DriftClientFactory proxyFactory = new DriftClientFactory(CODEC_MANAGER, methodInvokerFactory, addressSelector, directExecutor());
 
             DriftScribe scribe = proxyFactory.createDriftClient(DriftScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
 
@@ -148,7 +149,7 @@ final class ApacheThriftTesterUtil
                 .setSslEnabled(secure);
         ApacheThriftConnectionFactoryConfig factoryConfig = new ApacheThriftConnectionFactoryConfig();
         try (ApacheThriftMethodInvokerFactory<String> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, clientIdentity -> config)) {
-            DriftClientFactoryManager<String> proxyFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
+            DriftClientFactoryManager<String> proxyFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory, directExecutor());
             DriftClientFactory proxyFactory = proxyFactoryManager.createDriftClientFactory("myFactory", addressSelector, NORMAL_RESULT);
 
             DriftAsyncScribe scribe = proxyFactory.createDriftClient(DriftAsyncScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();

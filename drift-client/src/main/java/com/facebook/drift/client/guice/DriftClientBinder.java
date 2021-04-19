@@ -15,11 +15,14 @@
  */
 package com.facebook.drift.client.guice;
 
+import com.facebook.airlift.concurrent.BoundedExecutor;
 import com.facebook.airlift.configuration.ConfigDefaults;
 import com.facebook.drift.client.DriftClient;
 import com.facebook.drift.client.DriftClientFactory;
+import com.facebook.drift.client.DriftClientFactoryConfig;
 import com.facebook.drift.client.DriftClientFactoryManager;
 import com.facebook.drift.client.ExceptionClassifier;
+import com.facebook.drift.client.ForRetryService;
 import com.facebook.drift.client.MethodInvocationFilter;
 import com.facebook.drift.client.address.AddressSelector;
 import com.facebook.drift.client.stats.JmxMethodInvocationStatsFactory;
@@ -50,7 +53,9 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
+import static com.facebook.airlift.concurrent.Threads.daemonThreadsNamed;
 import static com.facebook.airlift.configuration.ConfigBinder.configBinder;
 import static com.facebook.drift.client.ExceptionClassifier.mergeExceptionClassifiers;
 import static com.facebook.drift.client.guice.DriftClientAnnotationFactory.extractDriftClientBindingAnnotation;
@@ -59,6 +64,7 @@ import static com.facebook.drift.codec.metadata.ThriftServiceMetadata.getThriftS
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
 import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.Executors.newCachedThreadPool;
 
 public class DriftClientBinder
 {
@@ -233,6 +239,7 @@ public class DriftClientBinder
         public void configure(Binder binder)
         {
             newSetBinder(binder, ExceptionClassifier.class);
+            configBinder(binder).bindConfig(DriftClientFactoryConfig.class);
             newOptionalBinder(binder, MBeanExporter.class);
             newOptionalBinder(binder, MethodInvocationStatsFactory.class)
                     .setDefault()
@@ -242,12 +249,21 @@ public class DriftClientBinder
 
         @Provides
         @Singleton
+        @ForRetryService
+        private static Executor getRetryService(DriftClientFactoryConfig config)
+        {
+            return new BoundedExecutor(newCachedThreadPool(daemonThreadsNamed("drift-client-retry-service-%s")), config.getNumRetryServiceThreadCount());
+        }
+
+        @Provides
+        @Singleton
         private static DriftClientFactoryManager<Annotation> getDriftClientFactory(
                 ThriftCodecManager codecManager,
                 MethodInvokerFactory<Annotation> methodInvokerFactory,
-                MethodInvocationStatsFactory methodInvocationStatsFactory)
+                MethodInvocationStatsFactory methodInvocationStatsFactory,
+                @ForRetryService Executor retryService)
         {
-            return new DriftClientFactoryManager<>(codecManager, methodInvokerFactory, methodInvocationStatsFactory);
+            return new DriftClientFactoryManager<>(codecManager, methodInvokerFactory, methodInvocationStatsFactory, retryService);
         }
 
         @Override

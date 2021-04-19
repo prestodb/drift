@@ -21,6 +21,8 @@ import com.facebook.drift.client.stats.NullMethodInvocationStatsFactory;
 import com.facebook.drift.codec.ThriftCodecManager;
 import com.facebook.drift.transport.client.MethodInvokerFactory;
 
+import java.util.concurrent.Executor;
+
 import static java.util.Objects.requireNonNull;
 
 public class DriftClientFactoryManager<I>
@@ -28,19 +30,22 @@ public class DriftClientFactoryManager<I>
     private final ThriftCodecManager codecManager;
     private final MethodInvokerFactory<I> methodInvokerFactory;
     private final MethodInvocationStatsFactory methodInvocationStatsFactory;
+    private final Executor retryService;
 
-    public DriftClientFactoryManager(ThriftCodecManager codecManager, MethodInvokerFactory<I> methodInvokerFactory)
+    public DriftClientFactoryManager(ThriftCodecManager codecManager, MethodInvokerFactory<I> methodInvokerFactory, Executor retryService)
     {
-        this(codecManager, methodInvokerFactory, new NullMethodInvocationStatsFactory());
+        this(codecManager, methodInvokerFactory, new NullMethodInvocationStatsFactory(), retryService);
     }
 
     public DriftClientFactoryManager(ThriftCodecManager codecManager,
             MethodInvokerFactory<I> methodInvokerFactory,
-            MethodInvocationStatsFactory methodInvocationStatsFactory)
+            MethodInvocationStatsFactory methodInvocationStatsFactory,
+            Executor retryService)
     {
         this.codecManager = requireNonNull(codecManager, "codecManager is null");
         this.methodInvokerFactory = requireNonNull(methodInvokerFactory, "methodInvokerFactory is null");
         this.methodInvocationStatsFactory = methodInvocationStatsFactory;
+        this.retryService = requireNonNull(retryService, "retryService is null");
     }
 
     public DriftClientFactory createDriftClientFactory(I clientIdentity, AddressSelector<?> addressSelector, ExceptionClassifier exceptionClassifier)
@@ -50,6 +55,7 @@ public class DriftClientFactoryManager<I>
                 () -> methodInvokerFactory.createMethodInvoker(clientIdentity),
                 addressSelector,
                 exceptionClassifier,
-                methodInvocationStatsFactory);
+                methodInvocationStatsFactory,
+                retryService);
     }
 }

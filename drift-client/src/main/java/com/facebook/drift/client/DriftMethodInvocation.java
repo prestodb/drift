@@ -15,7 +15,6 @@
  */
 package com.facebook.drift.client;
 
-import com.facebook.airlift.concurrent.BoundedExecutor;
 import com.facebook.airlift.log.Logger;
 import com.facebook.drift.TException;
 import com.facebook.drift.client.address.AddressSelector;
@@ -44,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import static com.facebook.drift.client.ExceptionClassification.HostStatus.DOWN;
 import static com.facebook.drift.client.ExceptionClassification.HostStatus.NORMAL;
@@ -69,7 +69,7 @@ class DriftMethodInvocation<A extends Address>
     private final Optional<String> addressSelectionContext;
     private final MethodInvocationStat stat;
     private final Ticker ticker;
-    private final BoundedExecutor retryService;
+    private final Executor retryService;
     private final long startTime;
 
     @GuardedBy("this")
@@ -98,7 +98,7 @@ class DriftMethodInvocation<A extends Address>
             Optional<String> addressSelectionContext,
             MethodInvocationStat stat,
             Ticker ticker,
-            BoundedExecutor retryService)
+            Executor retryService)
     {
         DriftMethodInvocation<A> invocation = new DriftMethodInvocation<>(
                 invoker,
@@ -126,7 +126,7 @@ class DriftMethodInvocation<A extends Address>
             Optional<String> addressSelectionContext,
             MethodInvocationStat stat,
             Ticker ticker,
-            BoundedExecutor retryService)
+            Executor retryService)
     {
         this.invoker = requireNonNull(invoker, "methodHandler is null");
         this.metadata = requireNonNull(metadata, "metadata is null");

@@ -15,7 +15,6 @@
  */
 package com.facebook.drift.client;
 
-import com.facebook.airlift.concurrent.BoundedExecutor;
 import com.facebook.drift.client.address.AddressSelector;
 import com.facebook.drift.client.stats.MethodInvocationStat;
 import com.facebook.drift.codec.metadata.ThriftHeaderParameter;
@@ -32,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import static com.facebook.drift.client.DriftMethodInvocation.createDriftMethodInvocation;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -47,7 +47,7 @@ class DriftMethodHandler
     private final AddressSelector<? extends Address> addressSelector;
     private final RetryPolicy retryPolicy;
     private final MethodInvocationStat stat;
-    private final BoundedExecutor retryService;
+    private final Executor retryService;
 
     public DriftMethodHandler(
             MethodMetadata metadata,
@@ -57,7 +57,7 @@ class DriftMethodHandler
             AddressSelector<? extends Address> addressSelector,
             RetryPolicy retryPolicy,
             MethodInvocationStat stat,
-            BoundedExecutor retryService)
+            Executor retryService)
     {
         this.metadata = requireNonNull(metadata, "metadata is null");
         this.headerParameters = requireNonNull(headersParameters, "headersParameters is null").stream()

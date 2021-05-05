@@ -190,14 +190,19 @@ public class TestDriftNettyServerTransport
                 // send second request, which will be blocked in the server because this client does not support out of order responses
                 // the only way to test this is with a sleep because the request is blocked inside of the server IO stack
                 sendLogRequest(22, messages, protocol);
-                assertNull(results.poll(1, SECONDS), "Second request future");
+
+                // If upgrading Netty (netty-all) to version >= 4.1.38, it has a bug so
+                // that the Second request future changed from [null] to an object in a PENDING state.
+                // Please see https://github.com/netty/netty/issues/10433
+                SettableFuture<Object> secondResult = results.poll(1, SECONDS);
+                assertNull(secondResult, "Second request future");
                 assertFalse(firstResult.isDone());
 
                 // finish the first invocation, second invocation will not be completed
                 firstResult.set(DriftResultCode.OK);
                 assertEquals(readLogResponse(11, protocol), ResultCode.OK);
 
-                SettableFuture<Object> secondResult = results.take();
+                secondResult = results.take();
                 assertFalse(secondResult.isDone());
 
                 // complete second invocation

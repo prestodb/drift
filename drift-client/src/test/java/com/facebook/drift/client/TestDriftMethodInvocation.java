@@ -21,6 +21,11 @@ import com.facebook.drift.TException;
 import com.facebook.drift.client.ExceptionClassification.HostStatus;
 import com.facebook.drift.client.address.AddressSelector;
 import com.facebook.drift.client.address.SimpleAddressSelector.SimpleAddress;
+import com.facebook.drift.client.exceptions.DriftMaxRetryAttemptsExceededException;
+import com.facebook.drift.client.exceptions.DriftNoHostsAvailableException;
+import com.facebook.drift.client.exceptions.DriftNonRetryableException;
+import com.facebook.drift.client.exceptions.DriftRetryTimeExceededException;
+import com.facebook.drift.client.exceptions.DriftRetriesFailedException;
 import com.facebook.drift.codec.ThriftCodec;
 import com.facebook.drift.codec.internal.builtin.ShortThriftCodec;
 import com.facebook.drift.protocol.TTransportException;
@@ -210,7 +215,7 @@ public class TestDriftMethodInvocation
         }
         catch (ExecutionException e) {
             assertEquals(attempts.get(), expectedRetries + 1);
-            assertClassifiedException(e.getCause(), new ExceptionClassification(Optional.of(false), NORMAL), expectedRetries);
+            assertClassifiedException(e.getCause(), DriftNonRetryableException.class, new ExceptionClassification(Optional.of(false), NORMAL), expectedRetries);
         }
         stat.assertFailure(expectedRetries);
         assertDelays(invoker, retryPolicy, expectedRetries);
@@ -241,7 +246,7 @@ public class TestDriftMethodInvocation
         }
         catch (ExecutionException e) {
             assertEquals(attempts.get(), expectedRetries + 1);
-            assertClassifiedException(e.getCause(), new ExceptionClassification(Optional.of(true), NORMAL), expectedRetries);
+            assertClassifiedException(e.getCause(), DriftNoHostsAvailableException.class, new ExceptionClassification(Optional.of(true), NORMAL), expectedRetries);
         }
         stat.assertFailure(expectedRetries);
     }
@@ -266,7 +271,7 @@ public class TestDriftMethodInvocation
         }
         catch (ExecutionException e) {
             assertEquals(attempts.get(), maxRetries + 1);
-            assertClassifiedException(e.getCause(), new ExceptionClassification(Optional.of(true), NORMAL), maxRetries);
+            assertClassifiedException(e.getCause(), DriftMaxRetryAttemptsExceededException.class, new ExceptionClassification(Optional.of(true), NORMAL), maxRetries);
         }
         stat.assertFailure(maxRetries);
     }
@@ -302,7 +307,7 @@ public class TestDriftMethodInvocation
         }
         catch (ExecutionException e) {
             assertEquals(attempts.get(), maxRetries + 1);
-            assertClassifiedException(e.getCause(), new ExceptionClassification(Optional.of(true), NORMAL), maxRetries);
+            assertClassifiedException(e.getCause(), DriftRetryTimeExceededException.class, new ExceptionClassification(Optional.of(true), NORMAL), maxRetries);
         }
         stat.assertFailure(maxRetries);
         assertDelays(invoker, retryPolicy, 7);
@@ -350,7 +355,7 @@ public class TestDriftMethodInvocation
             assertTrue(e.getCause() instanceof TTransportException);
             TTransportException transportException = (TTransportException) e.getCause();
             assertTrue(transportException.getMessage().startsWith("No hosts available"));
-            assertRetriesFailedInformation(transportException, 0, 0, overloaded ? expectedRetries : 0);
+            assertRetriesFailedInformation(transportException, DriftNoHostsAvailableException.class, 0, 0, overloaded ? expectedRetries : 0);
         }
         stat.assertNoHostsAvailable(expectedRetries);
         addressSelector.assertAllDown();
@@ -398,7 +403,7 @@ public class TestDriftMethodInvocation
             DriftApplicationException applicationException = (DriftApplicationException) e.getCause();
             assertTrue(applicationException.getCause() instanceof ClassifiedException);
             ClassifiedException classifiedException = (ClassifiedException) applicationException.getCause();
-            assertRetriesFailedInformation(classifiedException, failedConnections, expectedInvocationAttempts, 0);
+            assertRetriesFailedInformation(classifiedException, DriftNonRetryableException.class, failedConnections, expectedInvocationAttempts, 0);
         }
     }
 
@@ -750,7 +755,7 @@ public class TestDriftMethodInvocation
                 retryService);
     }
 
-    private static void assertClassifiedException(Throwable cause, ExceptionClassification exceptionClassification, int expectedRetries)
+    private static <E extends DriftRetriesFailedException> void assertClassifiedException(Throwable cause, Class<E> rootCauseType, ExceptionClassification exceptionClassification, int expectedRetries)
     {
         if (cause instanceof DriftApplicationException) {
             cause = cause.getCause();
@@ -758,24 +763,26 @@ public class TestDriftMethodInvocation
         assertTrue(cause instanceof ClassifiedException);
         ClassifiedException classifiedException = (ClassifiedException) cause;
         assertEquals(classifiedException.getClassification(), exceptionClassification);
-        assertRetriesFailedInformation(classifiedException, 0, expectedRetries + 1, 0);
+        assertRetriesFailedInformation(classifiedException, rootCauseType, 0, expectedRetries + 1, 0);
     }
 
-    private static void assertRetriesFailedInformation(Throwable exception, int expectedFailedConnections, int expectedInvocationAttempts, int expectedOverloaded)
+    private static <E extends DriftRetriesFailedException> void assertRetriesFailedInformation(Throwable exception, Class<E> rootCauseType, int expectedFailedConnections, int expectedInvocationAttempts, int expectedOverloaded)
     {
-        RetriesFailedException retriesFailedException = getRetriesFailedException(exception);
+        DriftRetriesFailedException retriesFailedException = getRetriesFailedException(exception, rootCauseType);
         assertEquals(retriesFailedException.getFailedConnections(), expectedFailedConnections);
         assertEquals(retriesFailedException.getInvocationAttempts(), expectedInvocationAttempts);
         assertEquals(retriesFailedException.getOverloadedRejects(), expectedOverloaded);
     }
 
-    private static RetriesFailedException getRetriesFailedException(Throwable exception)
+    private static <E extends DriftRetriesFailedException> DriftRetriesFailedException getRetriesFailedException(Throwable exception, Class<E> rootCauseType)
     {
         // method invocation attaches retry information using a suppressed exception
         Throwable[] suppressed = exception.getSuppressed();
         assertEquals(suppressed.length, 1);
-        assertTrue(suppressed[0] instanceof RetriesFailedException);
-        return (RetriesFailedException) suppressed[0];
+        assertTrue(suppressed[0] instanceof DriftRetriesFailedException);
+        assertEquals(suppressed[0].getClass(), rootCauseType);
+        assertTrue(rootCauseType.isAssignableFrom(suppressed[0].getClass()));
+        return (DriftRetriesFailedException) suppressed[0];
     }
 
     private static void assertUnexpectedException(Throwable cause)

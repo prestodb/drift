@@ -23,9 +23,10 @@ import com.facebook.drift.transport.MethodMetadata;
 import com.facebook.drift.transport.client.Address;
 import com.facebook.drift.transport.client.MethodInvoker;
 import com.google.common.base.Ticker;
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,13 +87,13 @@ class DriftMethodHandler
                 }
             }
 
-            ImmutableList.Builder<Object> newParameters = ImmutableList.builder();
+            List<Object> newParameters = new ArrayList<>();
             for (int index = 0; index < parameters.size(); index++) {
                 if (!headerParameters.containsKey(index)) {
                     newParameters.add(parameters.get(index));
                 }
             }
-            parameters = newParameters.build();
+            parameters = Collections.unmodifiableList(newParameters);
         }
         return createDriftMethodInvocation(invoker, metadata, headers, parameters, retryPolicy, addressSelector, addressSelectionContext, stat, Ticker.systemTicker(), retryService);
     }

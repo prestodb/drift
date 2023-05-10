@@ -38,10 +38,13 @@ public class ResponseOrderingHandler
     @Override
     public void write(ChannelHandlerContext context, Object message, ChannelPromise promise)
     {
+        // The call to setAutoRead(true) triggers a read inline. That can trigger an entire
+        // request-response cycle before we get a chance to write, breaking the ordering.
+        // Write the response first so that this doesn't happen.
+        context.write(message, promise);
         if (message instanceof ThriftFrame) {
             // always re-enable auto read
             context.channel().config().setAutoRead(true);
         }
-        context.write(message, promise);
     }
 }

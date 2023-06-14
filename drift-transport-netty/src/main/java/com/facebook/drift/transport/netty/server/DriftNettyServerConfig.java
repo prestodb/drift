@@ -59,6 +59,7 @@ public class DriftNettyServerConfig
 
     private boolean assumeClientsSupportOutOfOrderResponses = true;
     private boolean nativeTransportEnabled;
+    private boolean kqueueTransportEnabled;
 
     @Min(0)
     @Max(65535)
@@ -286,6 +287,19 @@ public class DriftNettyServerConfig
     public DriftNettyServerConfig setNativeTransportEnabled(boolean nativeTransportEnabled)
     {
         this.nativeTransportEnabled = nativeTransportEnabled;
+        return this;
+    }
+
+    public boolean isKqueueTransportEnabled()
+    {
+        return kqueueTransportEnabled;
+    }
+
+    @Config("thrift.server.kqueue-transport.enabled")
+    @ConfigDescription("Enable kqueue Transport")
+    public DriftNettyServerConfig setKqueueTransportEnabled(boolean kqueueTransportEnabled)
+    {
+        this.kqueueTransportEnabled = kqueueTransportEnabled;
         return this;
     }
 }

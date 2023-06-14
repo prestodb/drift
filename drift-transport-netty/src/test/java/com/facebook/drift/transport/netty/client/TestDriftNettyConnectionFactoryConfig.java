@@ -40,7 +40,8 @@ public class TestDriftNettyConnectionFactoryConfig
                 .setConnectionPoolIdleTimeout(new Duration(1, MINUTES))
                 .setSslContextRefreshTime(new Duration(1, MINUTES))
                 .setSocksProxy(null)
-                .setNativeTransportEnabled(false));
+                .setNativeTransportEnabled(false)
+                .setKqueueTransportEnabled(false));
     }
 
     @Test
@@ -55,6 +56,7 @@ public class TestDriftNettyConnectionFactoryConfig
                 .put("thrift.client.ssl-context.refresh-time", "33m")
                 .put("thrift.client.socks-proxy", "example.com:9876")
                 .put("thrift.client.native-transport.enabled", "true")
+                .put("thrift.client.kqueue-transport.enabled", "true")
                 .build();
 
         DriftNettyConnectionFactoryConfig expected = new DriftNettyConnectionFactoryConfig()
@@ -65,7 +67,8 @@ public class TestDriftNettyConnectionFactoryConfig
                 .setConnectionPoolIdleTimeout(new Duration(7, MINUTES))
                 .setSslContextRefreshTime(new Duration(33, MINUTES))
                 .setSocksProxy(HostAndPort.fromParts("example.com", 9876))
-                .setNativeTransportEnabled(true);
+                .setNativeTransportEnabled(true)
+                .setKqueueTransportEnabled(true);
 
         assertFullMapping(properties, expected);
     }

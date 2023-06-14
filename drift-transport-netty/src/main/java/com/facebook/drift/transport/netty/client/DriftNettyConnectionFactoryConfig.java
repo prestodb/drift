@@ -39,6 +39,7 @@ public class DriftNettyConnectionFactoryConfig
     private Duration sslContextRefreshTime = new Duration(1, MINUTES);
     private HostAndPort socksProxy;
     private boolean nativeTransportEnabled;
+    private boolean kqueueTransportEnabled;
 
     public int getThreadCount()
     {
@@ -138,6 +139,19 @@ public class DriftNettyConnectionFactoryConfig
     public DriftNettyConnectionFactoryConfig setNativeTransportEnabled(boolean nativeTransportEnabled)
     {
         this.nativeTransportEnabled = nativeTransportEnabled;
+        return this;
+    }
+
+    public boolean isKqueueTransportEnabled()
+    {
+        return kqueueTransportEnabled;
+    }
+
+    @Config("thrift.client.kqueue-transport.enabled")
+    @ConfigDescription("Enable kqueue Transport")
+    public DriftNettyConnectionFactoryConfig setKqueueTransportEnabled(boolean kqueueTransportEnabled)
+    {
+        this.kqueueTransportEnabled = kqueueTransportEnabled;
         return this;
     }
 }

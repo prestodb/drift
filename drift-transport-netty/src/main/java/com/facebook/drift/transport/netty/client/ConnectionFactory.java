@@ -26,6 +26,8 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollSocketChannel;
+import io.netty.channel.kqueue.KQueue;
+import io.netty.channel.kqueue.KQueueSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
@@ -67,6 +69,10 @@ class ConnectionFactory
         if (connectionFactoryConfig.isNativeTransportEnabled()) {
             checkState(Epoll.isAvailable(), "native transport is not available");
             socketChannelClass = EpollSocketChannel.class;
+        }
+        else if (connectionFactoryConfig.isKqueueTransportEnabled()) {
+            checkState(KQueue.isAvailable(), "kQueue transport is not available");
+            socketChannelClass = KQueueSocketChannel.class;
         }
 
         try {

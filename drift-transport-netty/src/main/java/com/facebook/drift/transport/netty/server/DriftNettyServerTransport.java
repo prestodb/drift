@@ -26,6 +26,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.kqueue.KQueue;
+import io.netty.channel.kqueue.KQueueEventLoopGroup;
+import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslContext;
@@ -75,6 +78,12 @@ public class DriftNettyServerTransport
             ioGroup = new EpollEventLoopGroup(config.getIoThreadCount(), threadsNamed("drift-server-io-%s"));
             workerGroup = new EpollEventLoopGroup(config.getWorkerThreadCount(), threadsNamed("drift-server-worker-%s"));
             serverSocketChannelClass = EpollServerSocketChannel.class;
+        }
+        else if (config.isKqueueTransportEnabled()) {
+            checkState(KQueue.isAvailable(), "native transport is not available");
+            ioGroup = new KQueueEventLoopGroup(config.getIoThreadCount(), threadsNamed("drift-server-io-%s"));
+            workerGroup = new KQueueEventLoopGroup(config.getWorkerThreadCount(), threadsNamed("drift-server-worker-%s"));
+            serverSocketChannelClass = KQueueServerSocketChannel.class;
         }
         else {
             ioGroup = new NioEventLoopGroup(config.getIoThreadCount(), threadsNamed("drift-server-io-%s"));

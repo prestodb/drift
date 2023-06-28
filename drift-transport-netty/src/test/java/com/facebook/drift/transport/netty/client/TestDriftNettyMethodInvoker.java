@@ -372,6 +372,8 @@ public class TestDriftNettyMethodInvoker
     private static int logNiftyInvocationHandlerOptional(HostAndPort address, List<DriftLogEntry> entries)
     {
         DriftNettyClientConfig config = new DriftNettyClientConfig();
+        config.setTransport(FRAMED);
+
         try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
                 DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
                         new DriftNettyConnectionFactoryConfig(),

@@ -33,7 +33,7 @@ import java.io.File;
 import java.util.List;
 
 import static com.facebook.drift.transport.netty.codec.Protocol.BINARY;
-import static com.facebook.drift.transport.netty.codec.Transport.FRAMED;
+import static com.facebook.drift.transport.netty.codec.Transport.HEADER;
 import static io.airlift.units.DataSize.Unit.MEGABYTE;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.DAYS;
@@ -42,7 +42,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class DriftNettyClientConfig
 {
-    private Transport transport = FRAMED;
+    private Transport transport = HEADER;
     private Protocol protocol = BINARY;
     private DataSize maxFrameSize = new DataSize(16, MEGABYTE);
 

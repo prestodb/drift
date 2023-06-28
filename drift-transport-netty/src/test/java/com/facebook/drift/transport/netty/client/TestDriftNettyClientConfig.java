@@ -44,7 +44,7 @@ public class TestDriftNettyClientConfig
     public void testDefaults()
     {
         assertRecordedDefaults(recordDefaults(DriftNettyClientConfig.class)
-                .setTransport(FRAMED)
+                .setTransport(HEADER)
                 .setProtocol(BINARY)
                 .setConnectTimeout(new Duration(500, MILLISECONDS))
                 .setRequestTimeout(new Duration(10, SECONDS))
@@ -69,7 +69,7 @@ public class TestDriftNettyClientConfig
     public void testExplicitPropertyMappings()
     {
         Map<String, String> properties = new ImmutableMap.Builder<String, String>()
-                .put("thrift.client.transport", "HEADER")
+                .put("thrift.client.transport", "FRAMED")
                 .put("thrift.client.protocol", "COMPACT")
                 .put("thrift.client.connect-timeout", "99ms")
                 .put("thrift.client.request-timeout", "33m")
@@ -91,7 +91,8 @@ public class TestDriftNettyClientConfig
                 .build();
 
         DriftNettyClientConfig expected = new DriftNettyClientConfig()
-                .setTransport(HEADER)
+                // testing a Transport that is not the default (HEADER)
+                .setTransport(FRAMED)
                 .setProtocol(COMPACT)
                 .setConnectTimeout(new Duration(99, MILLISECONDS))
                 .setRequestTimeout(new Duration(33, MINUTES))

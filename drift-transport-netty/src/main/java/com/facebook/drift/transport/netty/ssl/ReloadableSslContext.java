@@ -19,6 +19,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.hash.HashCode;
 import com.google.common.io.Files;
 import io.airlift.units.Duration;
+import io.netty.handler.ssl.ApplicationProtocolConfig;
+import io.netty.handler.ssl.ApplicationProtocolConfig.Protocol;
+import io.netty.handler.ssl.ApplicationProtocolConfig.SelectedListenerFailureBehavior;
+import io.netty.handler.ssl.ApplicationProtocolConfig.SelectorFailureBehavior;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 
@@ -127,6 +131,11 @@ public final class ReloadableSslContext
                 if (!ciphers.isEmpty()) {
                     sslContextBuilder.ciphers(ciphers);
                 }
+                // C++ ThriftServers expect the "thrift" ALPN value when using the legacy Header, Framed, and Unframed transports, to select an
+                // appropriate handler without having to peek at the content of the connection. If the server doesn't support the legacy transports,
+                // it should respond with a no_application_protocol alert and fail the TLS handshake.
+                sslContextBuilder.applicationProtocolConfig(new ApplicationProtocolConfig(
+                        Protocol.ALPN, SelectorFailureBehavior.FATAL_ALERT, SelectedListenerFailureBehavior.FATAL_ALERT, new String[] {"thrift"}));
                 sslContext.set(new SslContextHolder(sslContextBuilder.build()));
             }
         }

@@ -58,7 +58,7 @@
 
         <dep.nexus-staging-plugin.version>1.6.8</dep.nexus-staging-plugin.version>
 
-        <dep.netty.version>4.1.92.Final</dep.netty.version>
+        <dep.netty.version>4.1.107.Final</dep.netty.version>
     </properties>
 
     <dependencyManagement>

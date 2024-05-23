@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: oss-agent
+spec:
+  serviceAccountName: oss-agent
+  containers:
+  - name: maven
+    image: maven:3.8.6-openjdk-8-slim
+    tty: true
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+    command:
+    - cat

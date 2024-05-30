@@ -28,12 +28,6 @@ pipeline {
         timestamps()
     }
 
-    parameters {
-        booleanParam(name: 'PERFORM_MAVEN_RELEASE',
-                     defaultValue: false,
-                     description: 'Release and update development version when running in the master')
-    }
-
     stages {
         stage('Setup') {
             steps {
@@ -41,42 +35,7 @@ pipeline {
             }
         }
 
-        stage ('Prepare to Release') {
-            steps {
-                script {
-                    env.REPO_CURRENT_VERSION = sh(
-                        script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -ntp -DforceStdout',
-                        returnStdout: true).trim()
-                }
-                echo "current version: ${REPO_CURRENT_VERSION}"
-
-                sh '''
-                    git config --global --add safe.directory ${PWD}
-                    git config --global user.email "oss-release-bot@prestodb.io"
-                    git config --global user.name "oss-release-bot"
-                '''
-
-                sh '''
-                    mvn release:prepare -B -DskipTests \
-                        -DautoVersionSubmodules=true \
-                        -DgenerateBackupPoms=false
-
-                    git branch
-                    git log --pretty="format:%ce: %s" -8
-                    SCM_TAG=$(cat release.properties | grep scm.tag=)
-                    echo ${SCM_TAG#*=} > repo-release-tag.txt
-                '''
-
-                script {
-                    env.REPO_RELEASE_TAG = sh(
-                        script: 'cat repo-release-tag.txt',
-                        returnStdout: true).trim()
-                }
-                echo "release tag: ${REPO_RELEASE_TAG}"
-            }
-        }
-
-        stage ('Release Maven Artifacts') {
+        stage ('Debug GPG') {
             when {
                 allOf {
                     expression { params.PERFORM_MAVEN_RELEASE }
@@ -85,23 +44,6 @@ pipeline {
             }
 
             steps {
-                echo "Update GitHub Repo"
-                withCredentials([usernamePassword(
-                        credentialsId: "${GITHUB_OSS_TOKEN_ID}",
-                        passwordVariable: 'GIT_PASSWORD',
-                        usernameVariable: 'GIT_USERNAME')]) {
-                    sh '''
-                        git switch -c master
-                        git branch
-
-                        git --no-pager log --since="60 days ago" --graph --pretty=format:'%C(auto)%h%d%Creset %C(cyan)(%cd)%Creset %C(green)%cn <%ce>%Creset %s'
-                        head -n 18 pom.xml
-                        ORIGIN="https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/prestodb/drift.git"
-                        git push --follow-tags --set-upstream ${ORIGIN} master
-                    '''
-                }
-
-                echo "Release ${REPO_RELEASE_TAG} maven artifacts"
                 sh '''#!/bin/bash -ex
                     export GPG_TTY=$TTY
                     gpg --batch --import ${GPG_SECRET}
@@ -110,21 +52,10 @@ pipeline {
                     echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
                     printenv | sort
 
-                    git checkout ${REPO_RELEASE_TAG}
-                    git status
-                    git branch
-                    git log -8
-                    head -n 18 pom.xml
-
-                    mvn -s ${WORKSPACE}/jenkins/settings.xml -V -B -U -e -T2C deploy \
-                        -DautoReleaseAfterClose=true \
+                    mvn -s ${WORKSPACE}/jenkins/settings.xml -V -B -U -e -T2C install \
                         -Dgpg.passphrase=${GPG_PASSPHRASE} \
-                        -DkeepStagingRepositoryOnCloseRuleFailure=true \
-                        -DkeepStagingRepositoryOnFailure=true \
                         -DskipTests \
-                        -Poss-release \
-                        -Pdeploy-to-ossrh \
-                        -DstagingProgressTimeoutMinutes=10
+                        -Pdebug-gpg \
                 '''
             }
         }

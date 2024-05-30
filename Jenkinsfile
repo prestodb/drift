@@ -36,13 +36,6 @@ pipeline {
         }
 
         stage ('Debug GPG') {
-            when {
-                allOf {
-                    expression { params.PERFORM_MAVEN_RELEASE }
-                    branch 'master'
-                }
-            }
-
             steps {
                 sh '''#!/bin/bash -ex
                     export GPG_TTY=$TTY

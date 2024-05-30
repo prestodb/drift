@@ -15,7 +15,6 @@
  */
 package com.facebook.drift.client;
 
-import com.facebook.airlift.concurrent.BoundedExecutor;
 import com.facebook.drift.client.address.AddressSelector;
 import com.facebook.drift.client.stats.MethodInvocationStat;
 import com.facebook.drift.client.stats.MethodInvocationStatsFactory;
@@ -39,16 +38,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
-import static com.facebook.airlift.concurrent.Threads.daemonThreadsNamed;
 import static com.facebook.drift.client.ExceptionClassifier.NORMAL_RESULT;
 import static com.facebook.drift.client.FilteredMethodInvoker.createFilteredMethodInvoker;
 import static com.facebook.drift.transport.MethodMetadata.toMethodMetadata;
 import static com.google.common.reflect.Reflection.newProxy;
 import static java.util.Objects.requireNonNull;
-import static java.util.concurrent.Executors.newCachedThreadPool;
 
 public class DriftClientFactory
 {
@@ -58,41 +55,47 @@ public class DriftClientFactory
     private final ExceptionClassifier exceptionClassifier;
     private final ConcurrentMap<Class<?>, ThriftServiceMetadata> serviceMetadataCache = new ConcurrentHashMap<>();
     private final MethodInvocationStatsFactory methodInvocationStatsFactory;
+    private final Executor retryService;
 
     public DriftClientFactory(
             ThriftCodecManager codecManager,
             Supplier<MethodInvoker> methodInvokerSupplier,
             AddressSelector<? extends Address> addressSelector,
             ExceptionClassifier exceptionClassifier,
-            MethodInvocationStatsFactory methodInvocationStatsFactory)
+            MethodInvocationStatsFactory methodInvocationStatsFactory,
+            Executor retryService)
     {
         this.codecManager = requireNonNull(codecManager, "codecManager is null");
         this.methodInvokerSupplier = requireNonNull(methodInvokerSupplier, "methodInvokerSupplier is null");
         this.addressSelector = requireNonNull(addressSelector, "addressSelector is null");
         this.exceptionClassifier = exceptionClassifier;
         this.methodInvocationStatsFactory = requireNonNull(methodInvocationStatsFactory, "methodInvocationStatsFactory is null");
+        this.retryService = requireNonNull(retryService, "retryService is null");
     }
 
     public DriftClientFactory(
             ThriftCodecManager codecManager,
             MethodInvokerFactory<?> invokerFactory,
             AddressSelector<? extends Address> addressSelector,
-            ExceptionClassifier exceptionClassifier)
+            ExceptionClassifier exceptionClassifier,
+            Executor retryService)
     {
         this(
                 codecManager,
                 () -> invokerFactory.createMethodInvoker(null),
                 addressSelector,
                 exceptionClassifier,
-                new NullMethodInvocationStatsFactory());
+                new NullMethodInvocationStatsFactory(),
+                retryService);
     }
 
     public DriftClientFactory(
             ThriftCodecManager codecManager,
             MethodInvokerFactory<?> invokerFactory,
-            AddressSelector<? extends Address> addressSelector)
+            AddressSelector<? extends Address> addressSelector,
+            Executor retryService)
     {
-        this(codecManager, invokerFactory, addressSelector, NORMAL_RESULT);
+        this(codecManager, invokerFactory, addressSelector, NORMAL_RESULT, retryService);
     }
 
     public <T> DriftClient<T> createDriftClient(Class<T> clientInterface)
@@ -113,10 +116,6 @@ public class DriftClientFactory
         MethodInvoker invoker = createFilteredMethodInvoker(filters, methodInvokerSupplier.get());
 
         Optional<String> qualifier = qualifierAnnotation.map(Class::getSimpleName);
-
-        // Create a bounded executor with a pool size at 4x number of processors
-        ExecutorService coreExecutor = newCachedThreadPool(daemonThreadsNamed(clientInterface != null ? clientInterface.getName() : "" + "-retry-service-%s"));
-        BoundedExecutor retryService = new BoundedExecutor(coreExecutor, 4 * Runtime.getRuntime().availableProcessors());
 
         ImmutableMap.Builder<Method, DriftMethodHandler> builder = ImmutableMap.builder();
         for (ThriftMethodMetadata method : serviceMetadata.getMethods()) {

@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      with: 
+      with:
         show-progress: false
         # needed for the git-commit-id-plugin to work
         fetch-depth: 0

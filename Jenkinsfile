@@ -42,8 +42,6 @@ pipeline {
                     gpg --batch --import ${GPG_SECRET}
                     echo ${GPG_TRUST} | gpg --import-ownertrust -
                     gpg --list-secret-keys
-                    echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
-                    cat ~/.gnupg/gpg-agent.conf
                     printenv | sort
 
                     mvn -s ${WORKSPACE}/jenkins/settings.xml -V -B -U -e -T2C install \

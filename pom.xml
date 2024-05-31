@@ -415,13 +415,11 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                     </plugin>
-                    <!-- Sign artifacts using gpg for oss upload -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>3.2.4</version>
                         <configuration>
-                            <!-- Prevent gpg from using pinentry programs -->
                             <gpgArguments>
                                 <arg>--pinentry-mode</arg>
                                 <arg>loopback</arg>
@@ -431,7 +429,7 @@
                 </plugins>
             </build>
         </profile>
-        
+
         <profile>
             <id>deploy-to-ossrh</id>
             <build>

@@ -19,6 +19,11 @@ import com.facebook.airlift.concurrent.BoundedExecutor;
 import com.facebook.airlift.log.Logger;
 import com.facebook.drift.TException;
 import com.facebook.drift.client.address.AddressSelector;
+import com.facebook.drift.client.exceptions.DriftNonRetryableException;
+import com.facebook.drift.client.exceptions.DriftNoHostsAvailableException;
+import com.facebook.drift.client.exceptions.DriftRetriesFailedException;
+import com.facebook.drift.client.exceptions.DriftRetryTimeExceededException;
+import com.facebook.drift.client.exceptions.DriftMaxRetryAttemptsExceededException;
 import com.facebook.drift.client.stats.MethodInvocationStat;
 import com.facebook.drift.protocol.TTransportException;
 import com.facebook.drift.transport.MethodMetadata;
@@ -158,7 +163,12 @@ class DriftMethodInvocation<A extends Address>
 
             Optional<A> address = addressSelector.selectAddress(addressSelectionContext, attemptedAddresses);
             if (!address.isPresent()) {
-                fail("No hosts available");
+                fail(new DriftNoHostsAvailableException(
+                        invocationAttempts,
+                        succinctNanos(ticker.read() - startTime),
+                        failedConnections,
+                        overloadedRejects,
+                        attemptedAddresses));
                 return;
             }
 
@@ -252,15 +262,32 @@ class DriftMethodInvocation<A extends Address>
             if (!exceptionClassification.isRetry().orElse(FALSE)) {
                 // always store exception if non-retryable, so it is added to the exception chain
                 lastException = throwable;
-                fail("Non-retryable exception");
+                fail(new DriftNonRetryableException(
+                        invocationAttempts,
+                        succinctNanos(ticker.read() - startTime),
+                        failedConnections,
+                        overloadedRejects,
+                        attemptedAddresses));
                 return;
             }
             if (invocationAttempts > retryPolicy.getMaxRetries()) {
-                fail(format("Max retry attempts (%s) exceeded", retryPolicy.getMaxRetries()));
+                fail(new DriftMaxRetryAttemptsExceededException(
+                        retryPolicy.getMaxRetries(),
+                        invocationAttempts,
+                        succinctNanos(ticker.read() - startTime),
+                        failedConnections,
+                        overloadedRejects,
+                        attemptedAddresses));
                 return;
             }
             if (duration.compareTo(retryPolicy.getMaxRetryTime()) >= 0) {
-                fail(format("Max retry time (%s) exceeded", retryPolicy.getMaxRetryTime()));
+                fail(new DriftRetryTimeExceededException(
+                        retryPolicy.getMaxRetryTime(),
+                        invocationAttempts,
+                        succinctNanos(ticker.read() - startTime),
+                        failedConnections,
+                        overloadedRejects,
+                        attemptedAddresses));
                 return;
             }
 
@@ -323,28 +350,20 @@ class DriftMethodInvocation<A extends Address>
         }
     }
 
-    private synchronized void fail(String reason)
+    private synchronized void fail(DriftRetriesFailedException e)
     {
         Throwable cause = lastException;
         if (cause == null) {
             // There are no hosts or all hosts are marked down
-            cause = new TTransportException(reason);
+            cause = new TTransportException(e.getMessage());
         }
-
-        RetriesFailedException retriesFailedException = new RetriesFailedException(
-                reason,
-                invocationAttempts,
-                succinctNanos(ticker.read() - startTime),
-                failedConnections,
-                overloadedRejects,
-                attemptedAddresses);
 
         // attach message exception to the exception thrown to caller
         if (cause instanceof DriftApplicationException) {
-            cause.getCause().addSuppressed(retriesFailedException);
+            cause.getCause().addSuppressed(e);
         }
         else {
-            cause.addSuppressed(retriesFailedException);
+            cause.addSuppressed(e);
         }
 
         setException(cause);

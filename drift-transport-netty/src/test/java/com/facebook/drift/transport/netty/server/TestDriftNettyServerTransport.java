@@ -31,6 +31,7 @@ import com.facebook.drift.transport.server.ServerMethodInvoker;
 import com.facebook.drift.transport.server.ServerTransport;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Streams;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -46,6 +47,7 @@ import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportFactory;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -58,6 +60,7 @@ import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import static com.facebook.drift.codec.metadata.ThriftType.list;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Lists.newArrayList;
@@ -71,6 +74,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 
+@SuppressModernizer
 public class TestDriftNettyServerTransport
 {
     private static final ThriftCodecManager CODEC_MANAGER = new ThriftCodecManager();
@@ -165,7 +169,7 @@ public class TestDriftNettyServerTransport
                 address -> testOutOfOrderNotSupported(address, MESSAGES, new TFramedTransport.Factory(), new TBinaryProtocol.Factory(), methodInvoker.getFutureResults()),
                 address -> testOutOfOrderNotSupported(address, MESSAGES, new TFramedTransport.Factory(), new TCompactProtocol.Factory(), methodInvoker.getFutureResults())));
 
-        List<DriftLogEntry> expectedMessages = newArrayList(concat(nCopies(invocationCount, DRIFT_MESSAGES)));
+        List<DriftLogEntry> expectedMessages = Streams.concat(nCopies(invocationCount, DRIFT_MESSAGES).stream().flatMap(List::stream)).collect(toImmutableList());
         assertEquals(ImmutableList.copyOf(methodInvoker.getMessages()), expectedMessages);
     }
 

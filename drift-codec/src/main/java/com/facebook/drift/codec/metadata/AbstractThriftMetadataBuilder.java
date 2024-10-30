@@ -19,11 +19,12 @@ import com.facebook.drift.annotations.ThriftConstructor;
 import com.facebook.drift.annotations.ThriftField;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.internal.MoreTypes;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -47,6 +48,7 @@ import java.util.TreeSet;
 
 import static com.facebook.drift.annotations.ThriftField.Requiredness;
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.MoreCollectors.onlyElement;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toCollection;
@@ -75,6 +77,7 @@ public abstract class AbstractThriftMetadataBuilder
     protected final ThriftCatalog catalog;
     protected final MetadataErrors metadataErrors;
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     protected AbstractThriftMetadataBuilder(ThriftCatalog catalog, Type structType)
     {
         this.catalog = requireNonNull(catalog, "catalog is null");
@@ -111,6 +114,7 @@ public abstract class AbstractThriftMetadataBuilder
 
     public abstract ThriftStructMetadata build();
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public MetadataErrors getMetadataErrors()
     {
         return metadataErrors;
@@ -466,6 +470,7 @@ public abstract class AbstractThriftMetadataBuilder
         return parameters;
     }
 
+    @SuppressModernizer
     protected final void normalizeThriftFields(ThriftCatalog catalog)
     {
         // assign all fields an id (if possible)
@@ -478,7 +483,7 @@ public abstract class AbstractThriftMetadataBuilder
             Collection<FieldMetadata> fields = entry.getValue();
 
             // fields must have an id
-            if (!entry.getKey().isPresent()) {
+            if (entry.getKey().isEmpty()) {
                 Set<String> sortedFields = fields.stream()
                         .map(FieldMetadata::getOrExtractThriftFieldName)
                         .collect(toCollection(TreeSet::new));
@@ -584,7 +589,7 @@ public abstract class AbstractThriftMetadataBuilder
             // single id, so set on all fields in this group (groups with no id are handled later),
             // and validate isLegacyId is consistent and correct.
             if (ids.size() == 1) {
-                short id = Iterables.getOnlyElement(ids);
+                short id = ids.stream().collect(onlyElement());
 
                 boolean isLegacyId = extractFieldIsLegacyId(id, fieldName, fields);
 

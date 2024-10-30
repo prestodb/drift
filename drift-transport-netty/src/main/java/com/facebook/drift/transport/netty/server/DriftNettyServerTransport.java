@@ -30,6 +30,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.util.concurrent.Future;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
@@ -63,6 +64,7 @@ public class DriftNettyServerTransport
         this(methodInvoker, config, ByteBufAllocator.DEFAULT);
     }
 
+    @SuppressModernizer
     @VisibleForTesting
     public DriftNettyServerTransport(ServerMethodInvoker methodInvoker, DriftNettyServerConfig config, ByteBufAllocator allocator)
     {

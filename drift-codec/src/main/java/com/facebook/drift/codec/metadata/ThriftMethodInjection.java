@@ -16,6 +16,7 @@
 package com.facebook.drift.codec.metadata;
 
 import com.google.common.base.Joiner;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -42,11 +43,13 @@ public class ThriftMethodInjection
         this.parameters = requireNonNull(parameters, "parameters is null");
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public Method getMethod()
     {
         return method;
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public List<ThriftParameterInjection> getParameters()
     {
         return parameters;

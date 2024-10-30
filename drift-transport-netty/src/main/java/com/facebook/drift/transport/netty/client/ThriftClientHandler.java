@@ -48,6 +48,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.ScheduledFuture;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -252,6 +253,7 @@ public class ThriftClientHandler
         context.close();
     }
 
+    @SuppressModernizer
     private void onFrameTooLargeException(ChannelHandlerContext context, FrameTooLargeException frameTooLargeException)
     {
         TException thriftException = new MessageTooLargeException(frameTooLargeException.getMessage(), frameTooLargeException);

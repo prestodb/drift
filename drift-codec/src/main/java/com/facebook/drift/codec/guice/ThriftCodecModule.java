@@ -26,6 +26,7 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Objects;
 
@@ -41,11 +42,13 @@ public class ThriftCodecModule
         this(ThriftCodecModule.class.getClassLoader());
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ThriftCodecModule(ClassLoader parent)
     {
         this.parent = parent;
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     @Override
     public void configure(Binder binder)
     {

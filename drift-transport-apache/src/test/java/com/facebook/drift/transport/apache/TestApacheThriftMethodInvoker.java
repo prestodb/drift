@@ -33,7 +33,6 @@ import com.facebook.drift.transport.client.InvokeRequest;
 import com.facebook.drift.transport.client.MethodInvoker;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -61,7 +60,8 @@ import java.util.stream.Collectors;
 
 import static com.facebook.drift.codec.metadata.ThriftType.list;
 import static com.facebook.drift.codec.metadata.ThriftType.optional;
-import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Streams.concat;
 import static java.util.Collections.nCopies;
 import static org.testng.Assert.assertEquals;
 
@@ -97,7 +97,7 @@ public class TestApacheThriftMethodInvoker
                 address -> logApacheThriftInvocationHandler(address, DRIFT_MESSAGES),
                 address -> logApacheThriftInvocationHandlerOptional(address, DRIFT_MESSAGES)));
 
-        return newArrayList(Iterables.concat(nCopies(invocationCount, MESSAGES)));
+        return concat(nCopies(invocationCount, MESSAGES).stream().flatMap(List::stream)).collect(toImmutableList());
     }
 
     private static int testProcessor(TProcessor processor, List<ToIntFunction<HostAndPort>> clients)

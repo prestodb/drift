@@ -20,7 +20,6 @@ import com.facebook.drift.annotations.ThriftStruct;
 import com.facebook.drift.codec.metadata.ThriftStructMetadata.MetadataType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -32,6 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.facebook.drift.annotations.ThriftField.Requiredness;
+import static com.google.common.collect.MoreCollectors.onlyElement;
 
 @NotThreadSafe
 public class ThriftStructMetadataBuilder
@@ -141,7 +141,7 @@ public class ThriftStructMetadataBuilder
 
     private ThriftConstructorInjection buildConstructorInjection()
     {
-        ConstructorInjection injection = Iterables.getOnlyElement(constructorInjections);
+        ConstructorInjection injection = constructorInjections.stream().collect(onlyElement());
         return new ThriftConstructorInjection(injection.getConstructor(), buildParameterInjections(injection.getParameters()));
     }
 

@@ -61,10 +61,7 @@ public class OptionalThriftCodec<T>
         requireNonNull(protocol, "protocol is null");
         // write can not be called with a missing value, and instead the write should be skipped
         // after check the result from isNull
-        if (!value.isPresent()) {
-            throw new IllegalArgumentException("value is not present");
-        }
-        elementCodec.write(value.get(), protocol);
+        elementCodec.write(value.orElseThrow(() -> new IllegalArgumentException("value is not present")), protocol);
     }
 
     @Override

@@ -16,6 +16,7 @@
 package com.facebook.drift.codec.metadata;
 
 import com.google.common.reflect.TypeToken;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -74,6 +75,7 @@ public class ThriftFieldExtractor
         return name;
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public Field getField()
     {
         return field;

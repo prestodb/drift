@@ -1,6 +1,13 @@
 <FindBugsFilter>
     <!-- TODO: fix for https://github.com/spotbugs/spotbugs/issues/463 -->
     <Match>
-        <Bug pattern="RV_RETURN_VALUE_IGNORED" />
+        <Or>
+            <Bug pattern="EI_EXPOSE_REP" />
+            <Bug pattern="EI_EXPOSE_REP2" />
+            <Bug pattern="RV_RETURN_VALUE_IGNORED" />
+            <Bug pattern="CT_CONSTRUCTOR_THROW" />
+            <!-- SecurityManager is deprecated and slated for removal in 21+ -->
+            <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED" />
+        </Or>
     </Match>
 </FindBugsFilter>

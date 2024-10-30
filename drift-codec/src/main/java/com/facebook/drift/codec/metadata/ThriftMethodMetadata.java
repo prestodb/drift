@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.ListenableFuture;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -65,6 +66,7 @@ public class ThriftMethodMetadata
     private final boolean idempotent;
     private final List<String> documentation;
 
+    @SuppressFBWarnings({"CT_CONSTRUCTOR_THROW", "EI_EXPOSE_REP"})
     public ThriftMethodMetadata(Method method, ThriftCatalog catalog)
     {
         requireNonNull(method, "method is null");
@@ -221,6 +223,7 @@ public class ThriftMethodMetadata
         return exceptions;
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public Method getMethod()
     {
         return method;

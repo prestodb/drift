@@ -317,14 +317,14 @@ public final class HeaderTransport
             }
             SimpleFrameInfoDecoder simpleFrameInfoDecoder = new SimpleFrameInfoDecoder(HEADER, protocol, outOfOrderResponse);
             Optional<FrameInfo> frameInfo = simpleFrameInfoDecoder.tryDecodeFrameInfo(bufAllocator, buffer);
-            if (frameInfo.isPresent()) {
-                int messageSequenceId = frameInfo.get().getSequenceId();
+            frameInfo.ifPresent(frame -> {
+                int messageSequenceId = frame.getSequenceId();
                 checkArgument(
                         headerSequenceId == messageSequenceId,
                         "Sequence ids don't match. headerSequenceId: %s. messageSequenceId: %s",
                         headerSequenceId,
                         messageSequenceId);
-            }
+            });
             return frameInfo;
         }
         finally {

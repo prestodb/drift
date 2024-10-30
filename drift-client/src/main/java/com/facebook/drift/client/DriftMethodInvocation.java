@@ -35,6 +35,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.units.Duration;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
@@ -148,6 +149,7 @@ class DriftMethodInvocation<A extends Address>
         }, directExecutor());
     }
 
+    @SuppressModernizer
     private synchronized void nextAttempt(boolean noConnectDelay)
     {
         try {
@@ -157,29 +159,30 @@ class DriftMethodInvocation<A extends Address>
             }
 
             Optional<A> address = addressSelector.selectAddress(addressSelectionContext, attemptedAddresses);
-            if (!address.isPresent()) {
+            if (address.isEmpty()) {
                 fail("No hosts available");
                 return;
             }
+            A addr = address.get();
 
             if (invocationAttempts > 0) {
                 stat.recordRetry();
             }
 
             if (noConnectDelay) {
-                invoke(address.get());
+                invoke(addr);
                 return;
             }
 
-            int connectionFailuresCount = failedConnectionAttempts.count(address.get());
+            int connectionFailuresCount = failedConnectionAttempts.count(addr);
             if (connectionFailuresCount == 0) {
-                invoke(address.get());
+                invoke(addr);
                 return;
             }
 
             Duration connectDelay = retryPolicy.getBackoffDelay(connectionFailuresCount);
-            log.debug("Failed connection to %s with attempt %s, will retry in %s", address.get(), connectionFailuresCount, connectDelay);
-            schedule(connectDelay, () -> invoke(address.get()));
+            log.debug("Failed connection to %s with attempt %s, will retry in %s", addr, connectionFailuresCount, connectDelay);
+            schedule(connectDelay, () -> invoke(addr));
         }
         catch (Throwable t) {
             // this should never happen, but ensure that invocation always finishes

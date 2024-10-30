@@ -42,6 +42,7 @@ import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportFactory;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 
 import javax.net.ssl.SSLContext;
 
@@ -153,6 +154,7 @@ public class ApacheThriftMethodInvoker
         }
     }
 
+    @SuppressModernizer
     private TSocket createTSocket(HostAndPort address)
             throws TTransportException
     {

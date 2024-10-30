@@ -17,6 +17,7 @@ package com.facebook.drift.codec.metadata;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -44,6 +45,7 @@ public class ThriftConstructorInjection
         this.parameters = ImmutableList.copyOf(requireNonNull(parameters, "parameters is null"));
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public Constructor<?> getConstructor()
     {
         return constructor;

@@ -27,7 +27,6 @@ import com.facebook.drift.protocol.TProtocolWriter;
 import com.facebook.drift.protocol.TTransport;
 import com.facebook.drift.transport.MethodMetadata;
 import com.facebook.drift.transport.ParameterMetadata;
-import com.facebook.drift.transport.netty.codec.FrameInfo;
 import com.facebook.drift.transport.netty.codec.FrameTooLargeException;
 import com.facebook.drift.transport.netty.codec.Protocol;
 import com.facebook.drift.transport.netty.codec.ThriftFrame;
@@ -47,6 +46,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.units.Duration;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
@@ -109,11 +109,9 @@ public class ThriftServerHandler
     public void exceptionCaught(ChannelHandlerContext context, Throwable cause)
     {
         // if possible, try to reply with an exception in case of a too large request
-        if (cause instanceof FrameTooLargeException) {
-            FrameTooLargeException e = (FrameTooLargeException) cause;
+        if (cause instanceof FrameTooLargeException e) {
             // frame info may be missing in case of a large, but invalid request
-            if (e.getFrameInfo().isPresent()) {
-                FrameInfo frameInfo = e.getFrameInfo().get();
+            e.getFrameInfo().ifPresent(frameInfo -> {
                 try {
                     context.writeAndFlush(writeApplicationException(
                             context,
@@ -132,6 +130,8 @@ public class ThriftServerHandler
                     context.close();
                     log.error(t, "Failed to write frame info");
                 }
+            });
+            if (e.getFrameInfo().isPresent()) {
                 return;
             }
         }
@@ -188,6 +188,7 @@ public class ThriftServerHandler
         }
     }
 
+    @SuppressModernizer
     private ListenableFuture<ThriftFrame> decodeMessage(
             ChannelHandlerContext context,
             TTransport messageData,
@@ -204,7 +205,7 @@ public class ThriftServerHandler
 
         TMessage message = protocolReader.readMessageBegin();
         Optional<MethodMetadata> methodMetadata = methodInvoker.getMethodMetadata(message.getName());
-        if (!methodMetadata.isPresent()) {
+        if (methodMetadata.isEmpty()) {
             return immediateFuture(writeApplicationException(
                     context,
                     message.getName(),
@@ -372,6 +373,7 @@ public class ThriftServerHandler
         }
     }
 
+    @SuppressModernizer
     private static ThriftFrame writeExceptionResponse(ChannelHandlerContext context,
             MethodMetadata methodMetadata,
             List<ThriftHeaderTransform> transforms,

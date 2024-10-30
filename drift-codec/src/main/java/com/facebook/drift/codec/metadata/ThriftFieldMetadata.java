@@ -17,6 +17,8 @@ package com.facebook.drift.codec.metadata;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -52,6 +54,8 @@ public class ThriftFieldMetadata
     private final boolean isRecursiveReference;
     private final Requiredness requiredness;
 
+    @SuppressModernizer
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ThriftFieldMetadata(
             short id,
             boolean isLegacyId,

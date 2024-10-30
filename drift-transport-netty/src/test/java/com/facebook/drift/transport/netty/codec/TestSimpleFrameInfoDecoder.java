@@ -23,6 +23,7 @@ import com.facebook.drift.transport.netty.buffer.TestingPooledByteBufAllocator;
 import com.facebook.drift.transport.netty.ssl.TChannelBufferOutputTransport;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 import org.testng.annotations.Test;
 
 import static com.facebook.drift.protocol.TMessageType.CALL;
@@ -47,6 +48,7 @@ public class TestSimpleFrameInfoDecoder
         }
     }
 
+    @SuppressModernizer
     private static void testDecodeSequenceId(ByteBufAllocator allocator, Protocol protocol)
             throws TException
     {

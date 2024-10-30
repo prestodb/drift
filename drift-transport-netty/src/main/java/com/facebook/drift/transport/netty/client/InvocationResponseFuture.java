@@ -28,6 +28,7 @@ import com.google.common.util.concurrent.Futures;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 
 import javax.annotation.concurrent.GuardedBy;
 
@@ -53,6 +54,7 @@ class InvocationResponseFuture
     @GuardedBy("this")
     private ThriftRequest thriftRequest;
 
+    @SuppressModernizer
     static InvocationResponseFuture createInvocationResponseFuture(InvokeRequest request, ConnectionParameters connectionParameters, ConnectionManager connectionManager)
             throws TException
     {

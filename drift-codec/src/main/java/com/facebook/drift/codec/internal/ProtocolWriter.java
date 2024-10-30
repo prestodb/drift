@@ -24,6 +24,7 @@ import com.facebook.drift.protocol.TProtocolWriter;
 import com.facebook.drift.protocol.TSet;
 import com.facebook.drift.protocol.TStruct;
 import com.facebook.drift.protocol.TType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -37,6 +38,7 @@ public class ProtocolWriter
 {
     private final TProtocolWriter protocol;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ProtocolWriter(TProtocolWriter protocol)
     {
         this.protocol = protocol;

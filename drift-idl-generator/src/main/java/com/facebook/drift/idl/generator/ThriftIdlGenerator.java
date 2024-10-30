@@ -48,10 +48,10 @@ import java.util.function.Predicate;
 
 import static com.facebook.drift.codec.metadata.ReflectionHelper.getEffectiveClassAnnotations;
 import static com.facebook.drift.idl.generator.ThriftIdlRenderer.renderThriftIdl;
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.io.Files.getNameWithoutExtension;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
 
 public class ThriftIdlGenerator
 {
@@ -91,7 +91,7 @@ public class ThriftIdlGenerator
 
     public ThriftIdlGenerator(ThriftIdlGeneratorConfig config)
     {
-        this(config, firstNonNull(Thread.currentThread().getContextClassLoader(), ClassLoader.getSystemClassLoader()));
+        this(config, requireNonNullElse(Thread.currentThread().getContextClassLoader(), ClassLoader.getSystemClassLoader()));
     }
 
     public ThriftIdlGenerator(ThriftIdlGeneratorConfig config, ClassLoader classLoader)

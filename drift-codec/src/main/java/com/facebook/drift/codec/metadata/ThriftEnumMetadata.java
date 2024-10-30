@@ -19,6 +19,7 @@ import com.facebook.drift.annotations.ThriftEnumUnknownValue;
 import com.facebook.drift.annotations.ThriftEnumValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -46,6 +47,7 @@ public class ThriftEnumMetadata<T extends Enum<T>>
     private final ImmutableList<String> documentation;
     private final ImmutableMap<T, ImmutableList<String>> elementDocs;
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public ThriftEnumMetadata(
             String enumName,
             Class<T> enumClass)

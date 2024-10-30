@@ -26,6 +26,7 @@ import com.facebook.drift.codec.idlannotations.BeanWithOneIdlAnnotationMapForFie
 import com.facebook.drift.codec.idlannotations.ExceptionWithIdlAnnotations;
 import com.facebook.drift.codec.idlannotations.StructWithIdlAnnotations;
 import com.facebook.drift.codec.idlannotations.UnionWithIdlAnnotations;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Type;
@@ -37,6 +38,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
+@SuppressModernizer
 public class TestThriftStructMetadata
 {
     @Test

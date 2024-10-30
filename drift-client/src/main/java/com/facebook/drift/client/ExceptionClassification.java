@@ -153,13 +153,10 @@ public final class ExceptionClassification
             @SuppressWarnings("OptionalIsPresent")
             public static Optional<Boolean> mergeRetry(Optional<Boolean> oldRetry, Optional<Boolean> newRetry)
             {
-                if (!oldRetry.isPresent()) {
-                    return newRetry;
-                }
-                if (!newRetry.isPresent()) {
-                    return oldRetry;
-                }
-                return Optional.of(oldRetry.get() && newRetry.get());
+                return oldRetry.map(oldOne ->
+                        newRetry.map(newOne -> oldOne && newOne)
+                                .orElse(false))
+                        .or(() -> newRetry);
             }
         }
     }

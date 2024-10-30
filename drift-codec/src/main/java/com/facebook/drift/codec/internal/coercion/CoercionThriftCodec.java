@@ -20,6 +20,7 @@ import com.facebook.drift.codec.metadata.ThriftType;
 import com.facebook.drift.codec.metadata.TypeCoercion;
 import com.facebook.drift.protocol.TProtocolReader;
 import com.facebook.drift.protocol.TProtocolWriter;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -35,6 +36,7 @@ public class CoercionThriftCodec<T>
     private final TypeCoercion typeCoercion;
     private final ThriftType thriftType;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CoercionThriftCodec(ThriftCodec<?> codec, TypeCoercion typeCoercion)
     {
         this.codec = (ThriftCodec<Object>) codec;

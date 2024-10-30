@@ -25,6 +25,7 @@ import io.netty.handler.ssl.ApplicationProtocolConfig.SelectedListenerFailureBeh
 import io.netty.handler.ssl.ApplicationProtocolConfig.SelectorFailureBehavior;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 
 import java.io.File;
 import java.io.IOException;
@@ -88,6 +89,7 @@ public final class ReloadableSslContext
         return sslContext.get().getSslContext();
     }
 
+    @SuppressModernizer
     public synchronized void reload()
     {
         try {

@@ -42,9 +42,9 @@ import static com.facebook.airlift.concurrent.Threads.daemonThreadsNamed;
 import static com.facebook.drift.transport.netty.codec.Protocol.COMPACT;
 import static com.facebook.drift.transport.netty.codec.Transport.HEADER;
 import static com.facebook.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
 public class DriftNettyMethodInvokerFactory<I>
@@ -117,14 +117,14 @@ public class DriftNettyMethodInvokerFactory<I>
 
     public ConnectionManager getConnectionManager(I clientIdentity, DriftNettyClientConfig driftNettyClientConfig)
     {
-        boolean connectionPoolEnabled = firstNonNull(driftNettyClientConfig.getConnectionPoolEnabled(), factoryConfig.isConnectionPoolEnabled());
+        boolean connectionPoolEnabled = requireNonNullElse(driftNettyClientConfig.getConnectionPoolEnabled(), factoryConfig.isConnectionPoolEnabled());
         if (!connectionPoolEnabled) {
             return connectionFactory;
         }
 
-        int connectionPoolMaxSize = firstNonNull(driftNettyClientConfig.getConnectionPoolMaxSize(), factoryConfig.getConnectionPoolMaxSize());
-        int maxConnectionsPerDestination = firstNonNull(driftNettyClientConfig.getConnectionPoolMaxConnectionsPerDestination(), factoryConfig.getConnectionPoolMaxConnectionsPerDestination());
-        Duration connectionPoolIdleTimeout = firstNonNull(driftNettyClientConfig.getConnectionPoolIdleTimeout(), factoryConfig.getConnectionPoolIdleTimeout());
+        int connectionPoolMaxSize = requireNonNullElse(driftNettyClientConfig.getConnectionPoolMaxSize(), factoryConfig.getConnectionPoolMaxSize());
+        int maxConnectionsPerDestination = requireNonNullElse(driftNettyClientConfig.getConnectionPoolMaxConnectionsPerDestination(), factoryConfig.getConnectionPoolMaxConnectionsPerDestination());
+        Duration connectionPoolIdleTimeout = requireNonNullElse(driftNettyClientConfig.getConnectionPoolIdleTimeout(), factoryConfig.getConnectionPoolIdleTimeout());
 
         return connectionPools.computeIfAbsent(Optional.ofNullable(clientIdentity), ignored -> new ConnectionPool(
                 connectionFactory,

@@ -70,15 +70,14 @@ public class ThriftServerInitializer
     protected void initChannel(SocketChannel channel)
     {
         ChannelPipeline pipeline = channel.pipeline();
-
-        if (sslContextSupplier.isPresent()) {
+        sslContextSupplier.ifPresent(sslContext -> {
             if (allowPlainText) {
-                pipeline.addLast(new OptionalSslHandler(sslContextSupplier.get().get()));
+                pipeline.addLast(new OptionalSslHandler(sslContext.get()));
             }
             else {
-                pipeline.addLast(sslContextSupplier.get().get().newHandler(channel.alloc()));
+                pipeline.addLast(sslContext.get().newHandler(channel.alloc()));
             }
-        }
+        });
 
         pipeline.addLast(new ThriftProtocolDetection(
                 new ThriftServerHandler(methodInvoker, requestTimeout, timeoutExecutor),

@@ -38,7 +38,6 @@ import com.facebook.drift.codec.metadata.DefaultThriftTypeReference;
 import com.facebook.drift.codec.metadata.FieldKind;
 import com.facebook.drift.codec.metadata.ReflectionHelper;
 import com.facebook.drift.codec.metadata.ThriftConstructorInjection;
-import com.facebook.drift.codec.metadata.ThriftExtraction;
 import com.facebook.drift.codec.metadata.ThriftFieldExtractor;
 import com.facebook.drift.codec.metadata.ThriftFieldInjection;
 import com.facebook.drift.codec.metadata.ThriftFieldMetadata;
@@ -55,6 +54,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -110,7 +110,7 @@ import static com.facebook.drift.codec.ThriftProtocolType.SET;
 import static com.facebook.drift.codec.ThriftProtocolType.STRING;
 import static com.facebook.drift.codec.ThriftProtocolType.STRUCT;
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Iterables.getOnlyElement;
+import static com.google.common.collect.MoreCollectors.onlyElement;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 
@@ -142,7 +142,7 @@ public class ThriftCodecByteCodeGenerator<T>
     private final ThriftCodec<T> thriftCodec;
 
     @SuppressWarnings("unchecked")
-    @SuppressFBWarnings("DM_DEFAULT_ENCODING")
+    @SuppressFBWarnings({"DM_DEFAULT_ENCODING", "CT_CONSTRUCTOR_THROW", "EI_EXPOSE_REP2"})
     public ThriftCodecByteCodeGenerator(
             ThriftCodecManager codecManager,
             ThriftStructMetadata metadata,
@@ -208,6 +208,7 @@ public class ThriftCodecByteCodeGenerator<T>
         }
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public ThriftCodec<T> getThriftCodec()
     {
         return thriftCodec;
@@ -385,7 +386,8 @@ public class ThriftCodecByteCodeGenerator<T>
     {
         // constructor parameters
         List<BytecodeExpression> parameters = new ArrayList<>();
-        ThriftConstructorInjection constructor = metadata.getConstructorInjection().get();
+        ThriftConstructorInjection constructor = metadata.getConstructorInjection()
+                .orElseThrow();
         for (ThriftParameterInjection parameter : constructor.getParameters()) {
             BytecodeExpression data = structData.get(parameter.getId());
 
@@ -539,7 +541,7 @@ public class ThriftCodecByteCodeGenerator<T>
         method.getBody().append(switchBuilder.build());
 
         // find the @ThriftUnionId field
-        ThriftFieldMetadata idField = getOnlyElement(metadata.getFields(FieldKind.THRIFT_UNION_ID));
+        ThriftFieldMetadata idField = metadata.getFields(FieldKind.THRIFT_UNION_ID).stream().collect(onlyElement());
 
         injectIdField(method, idField, instance, fieldId);
 
@@ -579,23 +581,20 @@ public class ThriftCodecByteCodeGenerator<T>
 
         // use no-args constructor if present
         BytecodeBlock defaultBlock = new BytecodeBlock();
-        if (metadata.getConstructorInjection().isPresent()) {
-            ThriftConstructorInjection constructor = metadata.getConstructorInjection().get();
-            defaultBlock.append(instance.set(newInstance(constructor.getConstructor())));
-        }
-        else {
-            BytecodeExpression exception = newInstance(
-                    IllegalStateException.class,
-                    invokeStatic(
-                            String.class,
-                            "format",
-                            String.class,
-                            constantString("No constructor for union [%s] with field ID [%s] found"),
-                            newArray(type(Object[].class),
-                                    constantString(metadata.getStructClass().getName()),
-                                    fieldId.cast(Object.class))));
-            defaultBlock.append(exception).throwObject();
-        }
+        metadata.getConstructorInjection().ifPresentOrElse(injection -> defaultBlock.append(instance.set(newInstance(injection.getConstructor()))),
+                () -> {
+                    BytecodeExpression exception = newInstance(
+                            IllegalStateException.class,
+                            invokeStatic(
+                                    String.class,
+                                    "format",
+                                    String.class,
+                                    constantString("No constructor for union [%s] with field ID [%s] found"),
+                                    newArray(type(Object[].class),
+                                            constantString(metadata.getStructClass().getName()),
+                                            fieldId.cast(Object.class))));
+                    defaultBlock.append(exception).throwObject();
+                });
 
         // finish switch
         method.getBody().append(switchBuilder
@@ -629,6 +628,7 @@ public class ThriftCodecByteCodeGenerator<T>
         return block;
     }
 
+    @SuppressModernizer
     private void buildFieldIdSwitch(MethodDefinition method, Variable reader, Map<Short, Variable> structData, SwitchBuilder switchBuilder)
     {
         for (ThriftFieldMetadata field : metadata.getFields(FieldKind.THRIFT_FIELD)) {
@@ -710,6 +710,7 @@ public class ThriftCodecByteCodeGenerator<T>
     /**
      * Defines the code that calls the builder factory method.
      */
+    @SuppressModernizer
     private Variable invokeFactoryMethod(MethodDefinition method, Map<Short, Variable> structData, Variable instance)
     {
         if (metadata.getBuilderMethod().isPresent()) {
@@ -809,7 +810,7 @@ public class ThriftCodecByteCodeGenerator<T>
         body.append(writer.invoke("writeStructBegin", void.class, constantString(metadata.getStructName())));
 
         // find the @ThriftUnionId field
-        ThriftFieldMetadata idField = getOnlyElement(metadata.getFields(FieldKind.THRIFT_UNION_ID));
+        ThriftFieldMetadata idField = metadata.getFields(FieldKind.THRIFT_UNION_ID).stream().collect(onlyElement());
 
         // load its value
         BytecodeExpression value = getFieldValue(method, idField);
@@ -863,15 +864,15 @@ public class ThriftCodecByteCodeGenerator<T>
         }
 
         // coerce value
-        if (field.getCoercion().isPresent()) {
-            write.invokeStatic(field.getCoercion().get().getToThrift());
+        field.getCoercion().ifPresent(coercion -> {
+            write.invokeStatic(coercion.getToThrift());
 
             // if coerced value is null, don't write the field
             if (!isProtocolTypeJavaPrimitive(field)) {
                 write.dup();
                 write.ifNullGoto(fieldIsNull);
             }
-        }
+        });
 
         // write value
         Method writeMethod = getWriteMethod(field.getThriftType());
@@ -909,9 +910,8 @@ public class ThriftCodecByteCodeGenerator<T>
 
     private BytecodeExpression getFieldValue(MethodDefinition method, ThriftFieldMetadata field)
     {
-        BytecodeExpression value = method.getScope().getVariable("struct");
-        if (field.getExtraction().isPresent()) {
-            ThriftExtraction extraction = field.getExtraction().get();
+        return field.getExtraction().map(extraction -> {
+            BytecodeExpression value = method.getScope().getVariable("struct");
             if (extraction instanceof ThriftFieldExtractor) {
                 ThriftFieldExtractor fieldExtractor = (ThriftFieldExtractor) extraction;
                 value = value.getField(fieldExtractor.getField());
@@ -926,8 +926,8 @@ public class ThriftCodecByteCodeGenerator<T>
                     value = value.cast(type(methodExtractor.getType()));
                 }
             }
-        }
-        return value;
+            return value;
+        }).orElseGet(() -> method.getScope().getVariable("struct"));
     }
 
     /**
@@ -1009,14 +1009,9 @@ public class ThriftCodecByteCodeGenerator<T>
     private static boolean needsCastAfterRead(ThriftFieldMetadata field, Method readMethod)
     {
         Class<?> methodReturn = readMethod.getReturnType();
-        Class<?> fieldType;
-        if (field.getCoercion().isPresent()) {
-            fieldType = field.getCoercion().get().getFromThrift().getParameterTypes()[0];
-        }
-        else {
-            fieldType = TypeToken.of(field.getThriftType().getJavaType()).getRawType();
-        }
-        return !fieldType.isAssignableFrom(methodReturn);
+        return !field.getCoercion()
+                .<Class<?>>map(coercion -> coercion.getFromThrift().getParameterTypes()[0])
+                .orElseGet(() -> TypeToken.of(field.getThriftType().getJavaType()).getRawType()).isAssignableFrom(methodReturn);
     }
 
     private static boolean needsCodec(ThriftFieldMetadata fieldMetadata)

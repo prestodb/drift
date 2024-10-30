@@ -16,6 +16,7 @@
 package com.facebook.drift.codec.metadata;
 
 import com.facebook.drift.annotations.ThriftField;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.lang.reflect.Type;
 
@@ -31,6 +32,7 @@ class ParameterInjection
     private final Type parameterJavaType;
     private final Type thriftStructType;
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     ParameterInjection(Type thriftStructType, int parameterIndex, ThriftField annotation, String extractedName, Type parameterJavaType)
     {
         super(annotation, FieldKind.THRIFT_FIELD);

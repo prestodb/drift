@@ -51,9 +51,9 @@ import static com.facebook.drift.integration.ClientTestUtils.DRIFT_OK;
 import static com.facebook.drift.integration.ClientTestUtils.MESSAGES;
 import static com.facebook.drift.integration.DriftNettyTesterUtil.driftNettyTestClients;
 import static com.facebook.drift.integration.LegacyApacheThriftTesterUtil.legacyApacheThriftTestClients;
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Iterables.getOnlyElement;
-import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.MoreCollectors.onlyElement;
+import static com.google.common.collect.Streams.concat;
 import static java.util.Collections.nCopies;
 import static org.testng.Assert.assertEquals;
 
@@ -94,7 +94,7 @@ public class TestClientsWithDriftNettyServerTransport
         }
         int invocationCount = testDriftServer(methodInvoker, clients.build());
 
-        assertEquals(methodInvoker.getMessages(), newArrayList(concat(nCopies(invocationCount, MESSAGES))));
+        assertEquals(methodInvoker.getMessages(), concat(nCopies(invocationCount, MESSAGES).stream()).flatMap(List::stream).collect(toImmutableList()));
 
         return invocationCount;
     }
@@ -164,12 +164,15 @@ public class TestClientsWithDriftNettyServerTransport
             }
 
             Map<Short, Object> parameters = request.getParameters();
-            if (parameters.size() != 1 || !parameters.containsKey((short) 1) || !(getOnlyElement(parameters.values()) instanceof List)) {
+            if (parameters.size() != 1 || !parameters.containsKey((short) 1) || !(parameters.values().stream().collect(onlyElement()) instanceof List)) {
                 return Futures.immediateFailedFuture(new IllegalArgumentException("invalid parameters"));
             }
-            for (DriftLogEntry driftLogEntry : (List<DriftLogEntry>) getOnlyElement(parameters.values())) {
-                messages.add(new LogEntry(driftLogEntry.getCategory(), driftLogEntry.getMessage()));
-            }
+            ((List<DriftLogEntry>) parameters.values()
+                    .stream()
+                    .collect(onlyElement()))
+                    .forEach(driftLogEntry -> {
+                        messages.add(new LogEntry(driftLogEntry.getCategory(), driftLogEntry.getMessage()));
+                    });
 
             return Futures.immediateFuture(DRIFT_OK);
         }

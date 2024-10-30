@@ -59,19 +59,17 @@ public abstract class AbstractReflectionThriftCodec<T>
             throws Exception
     {
         try {
-            if (field.getExtraction().isPresent()) {
-                ThriftExtraction extraction = field.getExtraction().get();
-                if (extraction instanceof ThriftFieldExtractor) {
-                    ThriftFieldExtractor thriftFieldExtractor = (ThriftFieldExtractor) extraction;
-                    return thriftFieldExtractor.getField().get(instance);
-                }
-                else if (extraction instanceof ThriftMethodExtractor) {
-                    ThriftMethodExtractor thriftMethodExtractor = (ThriftMethodExtractor) extraction;
-                    return thriftMethodExtractor.getMethod().invoke(instance);
-                }
-                throw new IllegalAccessException("Unsupported field extractor type " + extraction.getClass().getName());
+            ThriftExtraction extraction = field.getExtraction()
+                    .orElseThrow(() -> new IllegalAccessException("No extraction present for " + field));
+            if (extraction instanceof ThriftFieldExtractor) {
+                ThriftFieldExtractor thriftFieldExtractor = (ThriftFieldExtractor) extraction;
+                return thriftFieldExtractor.getField().get(instance);
             }
-            throw new IllegalAccessException("No extraction present for " + field);
+            else if (extraction instanceof ThriftMethodExtractor) {
+                ThriftMethodExtractor thriftMethodExtractor = (ThriftMethodExtractor) extraction;
+                return thriftMethodExtractor.getMethod().invoke(instance);
+            }
+            throw new IllegalAccessException("Unsupported field extractor type " + extraction.getClass().getName());
         }
         catch (InvocationTargetException e) {
             throwIfUnchecked(e.getCause());

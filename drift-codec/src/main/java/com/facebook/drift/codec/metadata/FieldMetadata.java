@@ -18,6 +18,7 @@ package com.facebook.drift.codec.metadata;
 import com.facebook.drift.annotations.ThriftField;
 import com.facebook.drift.annotations.ThriftIdlAnnotation;
 import com.google.common.collect.ImmutableMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.Nullable;
 
@@ -40,6 +41,7 @@ abstract class FieldMetadata
     private Map<String, String> idlAnnotations;
     private final FieldKind type;
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     protected FieldMetadata(ThriftField annotation, FieldKind type)
     {
         this.type = type;

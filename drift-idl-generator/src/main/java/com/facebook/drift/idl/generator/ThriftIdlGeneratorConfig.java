@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
+import static java.util.Objects.requireNonNullElse;
 
 public class ThriftIdlGeneratorConfig
 {
@@ -41,13 +41,13 @@ public class ThriftIdlGeneratorConfig
             Consumer<String> warningLogger,
             Consumer<String> verboseLogger)
     {
-        this.defaultPackage = firstNonNull(defaultPackage, "");
-        this.namespaces = ImmutableMap.copyOf(firstNonNull(namespaces, ImmutableMap.of()));
-        this.includes = ImmutableMap.copyOf(firstNonNull(includes, ImmutableMap.of()));
+        this.defaultPackage = requireNonNullElse(defaultPackage, "");
+        this.namespaces = ImmutableMap.copyOf(requireNonNullElse(namespaces, ImmutableMap.of()));
+        this.includes = ImmutableMap.copyOf(requireNonNullElse(includes, ImmutableMap.of()));
         this.recursive = recursive;
-        this.errorLogger = firstNonNull(errorLogger, ignored -> {});
-        this.warningLogger = firstNonNull(warningLogger, ignored -> {});
-        this.verboseLogger = firstNonNull(verboseLogger, ignored -> {});
+        this.errorLogger = requireNonNullElse(errorLogger, ignored -> {});
+        this.warningLogger = requireNonNullElse(warningLogger, ignored -> {});
+        this.verboseLogger = requireNonNullElse(verboseLogger, ignored -> {});
     }
 
     public static Builder builder()
@@ -110,13 +110,13 @@ public class ThriftIdlGeneratorConfig
 
         public Builder namespaces(Map<String, String> namespaces)
         {
-            this.namespaces = ImmutableMap.copyOf(firstNonNull(namespaces, ImmutableMap.of()));
+            this.namespaces = ImmutableMap.copyOf(requireNonNullElse(namespaces, ImmutableMap.of()));
             return this;
         }
 
         public Builder includes(Map<String, String> includes)
         {
-            this.includes = ImmutableMap.copyOf(firstNonNull(includes, ImmutableMap.of()));
+            this.includes = ImmutableMap.copyOf(requireNonNullElse(includes, ImmutableMap.of()));
             return this;
         }
 

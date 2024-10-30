@@ -25,9 +25,6 @@ import com.google.inject.Inject;
 
 import javax.annotation.concurrent.Immutable;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 /**
  * Creates Thrift codecs directly in byte code.
  */
@@ -46,13 +43,13 @@ public class CompilerThriftCodecFactory
 
     public CompilerThriftCodecFactory(boolean debug)
     {
-        this(debug, getPrivilegedClassLoader(CompilerThriftCodecFactory.class.getClassLoader()));
+        this(debug, new DynamicClassLoader(CompilerThriftCodecFactory.class.getClassLoader()));
     }
 
     public CompilerThriftCodecFactory(boolean debug, ClassLoader parent)
     {
         this.debug = debug;
-        this.classLoader = getPrivilegedClassLoader(parent);
+        this.classLoader = new DynamicClassLoader(parent);
     }
 
     @Override
@@ -64,10 +61,5 @@ public class CompilerThriftCodecFactory
                 classLoader,
                 debug);
         return generator.getThriftCodec();
-    }
-
-    private static DynamicClassLoader getPrivilegedClassLoader(ClassLoader parent)
-    {
-        return AccessController.doPrivileged((PrivilegedAction<DynamicClassLoader>) () -> new DynamicClassLoader(parent));
     }
 }

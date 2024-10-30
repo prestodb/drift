@@ -19,6 +19,7 @@ import com.facebook.drift.codec.metadata.ThriftType;
 import com.facebook.drift.protocol.TProtocolReader;
 import com.facebook.drift.protocol.TProtocolWriter;
 import com.google.common.reflect.TypeToken;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.lang.reflect.Type;
 
@@ -35,6 +36,7 @@ public class DelegateCodec<T>
     private final ThriftCodecManager codecManager;
     private final TypeToken<T> typeToken;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public DelegateCodec(ThriftCodecManager codecManager, Type javaType)
     {
         this.codecManager = codecManager;

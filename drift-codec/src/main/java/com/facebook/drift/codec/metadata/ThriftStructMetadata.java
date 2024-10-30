@@ -18,6 +18,7 @@ package com.facebook.drift.codec.metadata;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.reflect.TypeToken;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -115,6 +116,7 @@ public class ThriftStructMetadata
         return builderMethod;
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public Map<String, String> getIdlAnnotations()
     {
         return idlAnnotations;

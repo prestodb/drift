@@ -54,6 +54,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -286,6 +287,7 @@ public final class ThriftCodecManager
         typeCodecs.put(codec.getType(), codec);
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public ThriftCatalog getCatalog()
     {
         return catalog;

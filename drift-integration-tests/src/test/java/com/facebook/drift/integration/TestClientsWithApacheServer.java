@@ -21,6 +21,7 @@ import com.facebook.drift.integration.scribe.apache.scribe;
 import com.facebook.drift.transport.netty.codec.Protocol;
 import com.facebook.drift.transport.netty.codec.Transport;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Streams;
 import com.google.common.net.HostAndPort;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -46,8 +47,7 @@ import static com.facebook.drift.integration.DriftNettyTesterUtil.driftNettyTest
 import static com.facebook.drift.integration.LegacyApacheThriftTesterUtil.legacyApacheThriftTestClients;
 import static com.facebook.drift.transport.netty.codec.Protocol.FB_COMPACT;
 import static com.facebook.drift.transport.netty.codec.Transport.HEADER;
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Collections.nCopies;
 import static org.testng.Assert.assertEquals;
 
@@ -93,7 +93,7 @@ public class TestClientsWithApacheServer
             }
         }
 
-        assertEquals(scribeService.getMessages(), newArrayList(concat(nCopies(invocationCount, MESSAGES))));
+        assertEquals(scribeService.getMessages(), Streams.concat(nCopies(invocationCount, MESSAGES).stream()).flatMap(List::stream).collect(toImmutableList()));
 
         return invocationCount;
     }

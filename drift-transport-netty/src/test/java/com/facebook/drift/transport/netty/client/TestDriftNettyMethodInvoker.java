@@ -43,6 +43,7 @@ import com.facebook.drift.transport.server.ServerMethodInvoker;
 import com.facebook.drift.transport.server.ServerTransport;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Streams;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -86,9 +87,8 @@ import static com.facebook.drift.codec.metadata.ThriftType.list;
 import static com.facebook.drift.codec.metadata.ThriftType.optional;
 import static com.facebook.drift.transport.netty.codec.Protocol.BINARY;
 import static com.facebook.drift.transport.netty.codec.Transport.FRAMED;
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Iterables.getOnlyElement;
-import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.MoreCollectors.onlyElement;
 import static java.util.Collections.nCopies;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -139,7 +139,7 @@ public class TestDriftNettyMethodInvoker
                 address -> logNiftyInvocationHandlerOptional(address, DRIFT_MESSAGES),
                 address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, FRAMED, BINARY)));
 
-        return newArrayList(concat(nCopies(invocationCount, MESSAGES)));
+        return Streams.concat(nCopies(invocationCount, MESSAGES).stream()).flatMap(List::stream).collect(toImmutableList());
     }
 
     private static int testProcessor(TProcessor processor, List<ToIntFunction<HostAndPort>> clients)
@@ -198,7 +198,7 @@ public class TestDriftNettyMethodInvoker
                 address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.HEADER, BINARY),
                 address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.HEADER, Protocol.FB_COMPACT)));
 
-        return newArrayList(concat(nCopies(invocationCount, DRIFT_MESSAGES)));
+        return Streams.concat(nCopies(invocationCount, DRIFT_MESSAGES).stream()).flatMap(List::stream).collect(toImmutableList());
     }
 
     private static int testMethodInvoker(ServerMethodInvoker methodInvoker, List<ToIntFunction<HostAndPort>> clients)
@@ -469,10 +469,10 @@ public class TestDriftNettyMethodInvoker
             }
 
             Map<Short, Object> parameters = request.getParameters();
-            if (parameters.size() != 1 || !parameters.containsKey((short) 1) || !(getOnlyElement(parameters.values()) instanceof List)) {
+            if (parameters.size() != 1 || !parameters.containsKey((short) 1) || !(parameters.values().stream().collect(onlyElement()) instanceof List)) {
                 return Futures.immediateFailedFuture(new IllegalArgumentException("invalid parameters"));
             }
-            List<DriftLogEntry> messages = (List<DriftLogEntry>) getOnlyElement(parameters.values());
+            List<DriftLogEntry> messages = (List<DriftLogEntry>) parameters.values().stream().collect(onlyElement());
 
             for (DriftLogEntry message : messages) {
                 if (message.getCategory().equals("exception")) {

@@ -34,7 +34,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MavenJUnitTestRunner.class)
-@MavenVersions({"3.2.3", "3.3.9", "3.5.0", "3.5.2"})
+@MavenVersions({"3.5.2", "3.8.3", "3.9.9"})
 @SuppressWarnings("JUnitTestNG")
 public class TestIdlGeneratorIntegration
 {

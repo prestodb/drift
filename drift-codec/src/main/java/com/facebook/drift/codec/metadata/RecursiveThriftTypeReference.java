@@ -16,6 +16,7 @@
 package com.facebook.drift.codec.metadata;
 
 import com.facebook.drift.codec.ThriftProtocolType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
@@ -29,6 +30,7 @@ public class RecursiveThriftTypeReference
     private final Type javaType;
     private final ThriftProtocolType protocolType;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public RecursiveThriftTypeReference(ThriftCatalog catalog, Type javaType)
     {
         this.catalog = catalog;

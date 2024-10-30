@@ -29,14 +29,16 @@ import com.facebook.drift.codec.metadata.ThriftStructMetadata;
 import com.facebook.drift.protocol.TProtocolReader;
 import com.facebook.drift.protocol.TProtocolWriter;
 import com.google.common.collect.Maps;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 
 import javax.annotation.concurrent.Immutable;
 
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Maps.uniqueIndex;
+import static com.google.common.collect.MoreCollectors.onlyElement;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
@@ -51,7 +53,7 @@ public class ReflectionThriftUnionCodec<T>
     {
         super(manager, metadata);
 
-        ThriftFieldMetadata idField = getOnlyElement(metadata.getFields(FieldKind.THRIFT_UNION_ID));
+        ThriftFieldMetadata idField = metadata.getFields(FieldKind.THRIFT_UNION_ID).stream().collect(onlyElement());
 
         this.idField = Maps.immutableEntry(idField, manager.getCodec(idField.getThriftType()));
         requireNonNull(this.idField.getValue(), () -> "No codec for ID field found: " + idField);
@@ -101,6 +103,7 @@ public class ReflectionThriftUnionCodec<T>
         return constructStruct(data);
     }
 
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     @Override
     public void write(T instance, TProtocolWriter protocol)
             throws Exception
@@ -130,6 +133,7 @@ public class ReflectionThriftUnionCodec<T>
         writer.writeStructEnd();
     }
 
+    @SuppressModernizer
     @SuppressWarnings("unchecked")
     private T constructStruct(Map.Entry<Short, Object> data)
             throws Exception

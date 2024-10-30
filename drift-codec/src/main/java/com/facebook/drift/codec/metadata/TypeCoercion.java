@@ -15,6 +15,8 @@
  */
 package com.facebook.drift.codec.metadata;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Method;
@@ -41,11 +43,13 @@ public class TypeCoercion
         return thriftType;
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public Method getToThrift()
     {
         return toThrift;
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public Method getFromThrift()
     {
         return fromThrift;

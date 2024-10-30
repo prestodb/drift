@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static java.lang.String.format;
 
 public class TestingServerTransport
         implements ServerTransport
@@ -60,7 +61,9 @@ public class TestingServerTransport
         Optional<MethodMetadata> methodMetadata = serverMethodInvoker.getMethodMetadata(methodName);
         checkArgument(methodMetadata.isPresent(), "Method %s not found", methodName);
 
-        ListenableFuture<Object> result = serverMethodInvoker.invoke(new ServerInvokeRequest(methodMetadata.get(), headers, parameters));
+        ListenableFuture<Object> result = serverMethodInvoker.invoke(new ServerInvokeRequest(
+                methodMetadata.orElseThrow(() -> new IllegalArgumentException(format("Method %s not found", methodName))),
+                headers, parameters));
 
         serverMethodInvoker.recordResult(methodName, startTime, result);
         return result;

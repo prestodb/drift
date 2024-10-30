@@ -20,6 +20,7 @@ import com.facebook.drift.codec.UnionBuilder;
 import com.facebook.drift.codec.UnionConstructor;
 import com.facebook.drift.codec.UnionField;
 import com.facebook.drift.codec.UnionMethod;
+import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +30,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
+@SuppressModernizer
 public class TestThriftUnionMetadata
 {
     @Test

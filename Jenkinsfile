@@ -1,9 +1,28 @@
+AGENT_YAML = '''
+    apiVersion: v1
+    kind: Pod
+    spec:
+      containers:
+      - name: maven
+        image: maven:3.8.6-openjdk-8-slim
+        tty: true
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        command:
+        - cat
+'''
+
 pipeline {
 
     agent {
         kubernetes {
             defaultContainer 'maven'
-            yamlFile 'jenkins/agent.yaml'
+            yaml AGENT_YAML
         }
     }
 
@@ -12,7 +31,7 @@ pipeline {
         GPG_TRUST      = credentials("presto-release-gpg-trust")
         GPG_PASSPHRASE = credentials("presto-release-gpg-passphrase")
 
-        GITHUB_OSS_TOKEN_ID = 'github-personal-token-wanglinsong'
+        GITHUB_OSS_TOKEN_ID = 'oss-presto-github-token'
 
         SONATYPE_NEXUS_CREDS    = credentials('presto-sonatype-nexus-creds')
         SONATYPE_NEXUS_PASSWORD = "$SONATYPE_NEXUS_CREDS_PSW"
@@ -107,6 +126,7 @@ pipeline {
                     gpg --batch --import ${GPG_SECRET}
                     echo ${GPG_TRUST} | gpg --import-ownertrust -
                     gpg --list-secret-keys
+                    echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
                     printenv | sort
 
                     git checkout ${REPO_RELEASE_TAG}
@@ -115,7 +135,7 @@ pipeline {
                     git log -8
                     head -n 18 pom.xml
 
-                    mvn -s ${WORKSPACE}/jenkins/settings.xml -V -B -U -e -T2C deploy \
+                    mvn -s settings.xml -V -B -U -e -T2C deploy \
                         -DautoReleaseAfterClose=true \
                         -Dgpg.passphrase=${GPG_PASSPHRASE} \
                         -DkeepStagingRepositoryOnCloseRuleFailure=true \

@@ -23,6 +23,7 @@ import com.facebook.drift.codec.internal.builtin.ByteBufferThriftCodec;
 import com.facebook.drift.codec.internal.builtin.ByteThriftCodec;
 import com.facebook.drift.codec.internal.builtin.DoubleArrayThriftCodec;
 import com.facebook.drift.codec.internal.builtin.DoubleThriftCodec;
+import com.facebook.drift.codec.internal.builtin.FloatThriftCodec;
 import com.facebook.drift.codec.internal.builtin.IntArrayThriftCodec;
 import com.facebook.drift.codec.internal.builtin.IntegerThriftCodec;
 import com.facebook.drift.codec.internal.builtin.ListThriftCodec;
@@ -172,6 +173,7 @@ public final class ThriftCodecManager
         addBuiltinCodec(new IntegerThriftCodec());
         addBuiltinCodec(new LongThriftCodec());
         addBuiltinCodec(new DoubleThriftCodec());
+        addBuiltinCodec(new FloatThriftCodec());
         addBuiltinCodec(new ByteBufferThriftCodec());
         addBuiltinCodec(new StringThriftCodec());
         addBuiltinCodec(new VoidThriftCodec());

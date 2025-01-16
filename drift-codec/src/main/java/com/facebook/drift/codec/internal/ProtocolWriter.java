@@ -102,6 +102,14 @@ public class ProtocolWriter
         protocol.writeFieldEnd();
     }
 
+    public void writeFloatField(String name, short id, float f)
+            throws TException
+    {
+        protocol.writeFieldBegin(new TField(name, TType.FLOAT, id));
+        protocol.writeFloat(f);
+        protocol.writeFieldEnd();
+    }
+
     public void writeI16Field(String name, short id, short i16)
             throws TException
     {
@@ -210,6 +218,18 @@ public class ProtocolWriter
         protocol.writeFieldEnd();
     }
 
+    public void writeFloatArrayField(String name, short id, float[] array)
+            throws Exception
+    {
+        if (array == null) {
+            return;
+        }
+
+        protocol.writeFieldBegin(new TField(name, TType.LIST, id));
+        writeFloatArray(array);
+        protocol.writeFieldEnd();
+    }
+
     public <E> void writeSetField(String name, short id, ThriftCodec<Set<E>> codec, Set<E> set)
             throws Exception
     {
@@ -303,6 +323,12 @@ public class ProtocolWriter
         protocol.writeDouble(dub);
     }
 
+    public void writeFloat(float f)
+            throws TException
+    {
+        protocol.writeFloat(f);
+    }
+
     public void writeString(String string)
             throws TException
     {
@@ -358,6 +384,16 @@ public class ProtocolWriter
         protocol.writeListBegin(new TList(TType.DOUBLE, array.length));
         for (double doubleValue : array) {
             writeDouble(doubleValue);
+        }
+        protocol.writeListEnd();
+    }
+
+    public void writeFloatArray(float[] array)
+            throws TException
+    {
+        protocol.writeListBegin(new TList(TType.FLOAT, array.length));
+        for (float floatValue : array) {
+            writeFloat(floatValue);
         }
         protocol.writeListEnd();
     }

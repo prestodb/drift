@@ -20,6 +20,7 @@ import com.facebook.drift.annotations.ThriftStruct;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Booleans;
 import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
@@ -52,6 +53,9 @@ public final class ArrayField
     @ThriftField(6)
     public byte[] byteArray;
 
+    @ThriftField(7)
+    public float[] floatArray;
+
     @ThriftField(11)
     public Map<Short, boolean[]> mapBooleanArray;
 
@@ -67,11 +71,14 @@ public final class ArrayField
     @ThriftField(15)
     public Map<Short, double[]> mapDoubleArray;
 
+    @ThriftField(16)
+    public Map<Short, float[]> mapFloatArray;
+
     public ArrayField()
     {
     }
 
-    public ArrayField(boolean[] booleanArray, short[] shortArray, int[] intArray, long[] longArray, double[] doubleArray, byte[] byteArray)
+    public ArrayField(boolean[] booleanArray, short[] shortArray, int[] intArray, long[] longArray, double[] doubleArray, byte[] byteArray, float[] floatArray)
     {
         this.booleanArray = booleanArray;
         this.shortArray = shortArray;
@@ -79,6 +86,7 @@ public final class ArrayField
         this.longArray = longArray;
         this.doubleArray = doubleArray;
         this.byteArray = byteArray;
+        this.floatArray = floatArray;
     }
 
     public ArrayField(boolean[] booleanArray,
@@ -87,11 +95,13 @@ public final class ArrayField
             long[] longArray,
             double[] doubleArray,
             byte[] byteArray,
+            float[] floatArray,
             Map<Short, boolean[]> mapBooleanArray,
             Map<Short, short[]> mapShortArray,
             Map<Short, int[]> mapIntArray,
             Map<Short, long[]> mapLongArray,
-            Map<Short, double[]> mapDoubleArray)
+            Map<Short, double[]> mapDoubleArray,
+            Map<Short, float[]> mapFloatArray)
     {
         this.booleanArray = booleanArray;
         this.shortArray = shortArray;
@@ -99,11 +109,13 @@ public final class ArrayField
         this.longArray = longArray;
         this.doubleArray = doubleArray;
         this.byteArray = byteArray;
+        this.floatArray = floatArray;
         this.mapBooleanArray = mapBooleanArray;
         this.mapShortArray = mapShortArray;
         this.mapIntArray = mapIntArray;
         this.mapLongArray = mapLongArray;
         this.mapDoubleArray = mapDoubleArray;
+        this.mapFloatArray = mapFloatArray;
     }
 
     public Map<Short, List<Boolean>> getMapBooleanList()
@@ -146,6 +158,14 @@ public final class ArrayField
         return Maps.transformValues(mapDoubleArray, Doubles::asList);
     }
 
+    public Map<Short, List<Float>> getMapFloatList()
+    {
+        if (mapFloatArray == null) {
+            return null;
+        }
+        return Maps.transformValues(mapFloatArray, Floats::asList);
+    }
+
     @Override
     public int hashCode()
     {
@@ -156,11 +176,13 @@ public final class ArrayField
                 longArray,
                 doubleArray,
                 byteArray,
+                floatArray,
                 getMapBooleanList(),
                 getMapShortList(),
                 getMapIntegerList(),
                 getMapLongList(),
-                getMapDoubleList());
+                getMapDoubleList(),
+                getMapFloatList());
     }
 
     @Override
@@ -179,11 +201,13 @@ public final class ArrayField
                 Arrays.equals(this.longArray, other.longArray) &&
                 Arrays.equals(this.doubleArray, other.doubleArray) &&
                 Arrays.equals(this.byteArray, other.byteArray) &&
+                Arrays.equals(this.floatArray, other.floatArray) &&
                 Objects.equals(getMapBooleanList(), other.getMapBooleanList()) &&
                 Objects.equals(getMapShortList(), other.getMapShortList()) &&
                 Objects.equals(getMapIntegerList(), other.getMapIntegerList()) &&
                 Objects.equals(getMapLongList(), other.getMapLongList()) &&
-                Objects.equals(getMapDoubleList(), other.getMapDoubleList());
+                Objects.equals(getMapDoubleList(), other.getMapDoubleList()) &&
+                Objects.equals(getMapFloatList(), other.getMapFloatList());
     }
 
     @Override
@@ -196,11 +220,13 @@ public final class ArrayField
                 .add("longArray", Arrays.toString(longArray))
                 .add("doubleArray", Arrays.toString(doubleArray))
                 .add("byteArray", Arrays.toString(byteArray))
+                .add("floatArray", Arrays.toString(floatArray))
                 .add("mapBooleanArray", getMapBooleanList())
                 .add("mapShortArray", getMapShortList())
                 .add("mapIntArray", getMapIntegerList())
                 .add("mapLongArray", getMapLongList())
                 .add("mapDoubleArray", getMapDoubleList())
+                .add("mapFloatArray", getMapFloatList())
                 .toString();
     }
 }

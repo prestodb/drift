@@ -175,6 +175,18 @@ public class ProtocolReader
         return fieldValue;
     }
 
+    public float readFloatField()
+            throws TException
+    {
+        if (!checkReadState(TType.FLOAT)) {
+            return 0;
+        }
+        currentField = null;
+        float fieldValue = protocol.readFloat();
+        protocol.readFieldEnd();
+        return fieldValue;
+    }
+
     public short readI16Field()
             throws TException
     {
@@ -295,6 +307,18 @@ public class ProtocolReader
         return fieldValue;
     }
 
+    public float[] readFloatArrayField()
+            throws TException
+    {
+        if (!checkReadState(TType.LIST)) {
+            return null;
+        }
+        currentField = null;
+        float[] fieldValue = readFloatArray();
+        protocol.readFieldEnd();
+        return fieldValue;
+    }
+
     public <E> Set<E> readSetField(ThriftCodec<Set<E>> setCodec)
             throws Exception
     {
@@ -391,6 +415,12 @@ public class ProtocolReader
         return protocol.readDouble();
     }
 
+    public float readFloat()
+            throws TException
+    {
+        return protocol.readFloat();
+    }
+
     public String readString()
             throws TException
     {
@@ -452,6 +482,18 @@ public class ProtocolReader
         double[] array = new double[list.getSize()];
         for (int i = 0; i < list.getSize(); i++) {
             array[i] = readDouble();
+        }
+        protocol.readListEnd();
+        return array;
+    }
+
+    public float[] readFloatArray()
+            throws TException
+    {
+        TList list = protocol.readListBegin();
+        float[] array = new float[list.getSize()];
+        for (int i = 0; i < list.getSize(); i++) {
+            array[i] = readFloat();
         }
         protocol.readListEnd();
         return array;

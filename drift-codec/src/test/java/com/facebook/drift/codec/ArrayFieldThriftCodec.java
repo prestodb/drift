@@ -51,6 +51,7 @@ public class ArrayFieldThriftCodec
         long[] longArray = null;
         double[] doubleArray = null;
         byte[] byteArray = null;
+        float[] floatArray = null;
 
         reader.readStructBegin();
 
@@ -73,6 +74,9 @@ public class ArrayFieldThriftCodec
                     break;
                 case 6:
                     byteArray = reader.readBinaryField().array();
+                    break;
+                case 7:
+                    floatArray = reader.readFloatArrayField();
                     break;
                 default:
                     reader.skipFieldData();
@@ -98,6 +102,9 @@ public class ArrayFieldThriftCodec
         }
         if (booleanArray != null) {
             arrayField.byteArray = byteArray;
+        }
+        if (floatArray != null) {
+            arrayField.floatArray = floatArray;
         }
 
         return arrayField;
@@ -134,6 +141,10 @@ public class ArrayFieldThriftCodec
         byte[] byteArray = value.byteArray;
         if (byteArray != null) {
             writer.writeBinaryField("byteArray", (short) 6, ByteBuffer.wrap(byteArray));
+        }
+        float[] floatArray = value.floatArray;
+        if (floatArray != null) {
+            writer.writeFloatArrayField("floatArray", (short) 7, floatArray);
         }
 
         writer.writeStructEnd();

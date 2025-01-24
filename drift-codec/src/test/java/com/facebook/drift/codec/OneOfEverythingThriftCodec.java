@@ -95,7 +95,7 @@ public class OneOfEverythingThriftCodec
                 case 9:
                     aEnum = reader.readEnumField(aFruitCodec);
                     break;
-                case 60:
+                case 70:
                     aUnion = reader.readStructField(aUnionCodec);
                     break;
                 case 80:
@@ -139,7 +139,7 @@ public class OneOfEverythingThriftCodec
         writer.writeStringField("aString", (short) 7, oneOfEverything.aString);
         writer.writeStructField("aStruct", (short) 8, aStructCodec, oneOfEverything.aStruct);
         writer.writeEnumField("aEnum", (short) 9, aFruitCodec, oneOfEverything.aEnum);
-        writer.writeStructField("aUnion", (short) 61, aUnionCodec, oneOfEverything.aUnion);
+        writer.writeStructField("aUnion", (short) 70, aUnionCodec, oneOfEverything.aUnion);
         writer.writeFloatField("aFloat", (short) 80, oneOfEverything.aFloat);
         writer.writeStructEnd();
     }

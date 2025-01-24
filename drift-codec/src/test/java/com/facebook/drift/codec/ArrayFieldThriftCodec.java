@@ -100,7 +100,7 @@ public class ArrayFieldThriftCodec
         if (doubleArray != null) {
             arrayField.doubleArray = doubleArray;
         }
-        if (booleanArray != null) {
+        if (byteArray != null) {
             arrayField.byteArray = byteArray;
         }
         if (floatArray != null) {

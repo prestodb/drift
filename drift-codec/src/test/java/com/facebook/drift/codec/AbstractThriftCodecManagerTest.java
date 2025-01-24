@@ -275,6 +275,38 @@ public abstract class AbstractThriftCodecManagerTest
     }
 
     @Test
+    public void testArraysContainingOnlyBooleanArray()
+            throws Exception
+    {
+        ArrayField arrayField = new ArrayField(
+                new boolean[] {true, false, false, true},
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        testRoundTripSerialize(arrayField, TCompactProtocol::new);
+    }
+
+    @Test
+    public void testArraysContainingOnlyByteArray()
+            throws Exception
+    {
+        ArrayField arrayField = new ArrayField(
+                null,
+                null,
+                null,
+                null,
+                null,
+                "hello".getBytes(UTF_8),
+                null);
+
+        testRoundTripSerialize(arrayField, TCompactProtocol::new);
+    }
+
+    @Test
     public void testArrays()
             throws Exception
     {

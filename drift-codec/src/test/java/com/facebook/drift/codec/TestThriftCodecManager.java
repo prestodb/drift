@@ -67,6 +67,7 @@ public class TestThriftCodecManager
         testRoundTripSerialize(10000);
         testRoundTripSerialize((long) 10000000);
         testRoundTripSerialize(42.42d);
+        testRoundTripSerialize(58.7f);
         testRoundTripSerialize("some string");
         testRoundTripSerialize(UTF8_TEST_STRING);
     }
@@ -82,6 +83,7 @@ public class TestThriftCodecManager
         testRoundTripSerialize(ThriftType.I32, 10000);
         testRoundTripSerialize(ThriftType.I64, (long) 10000000);
         testRoundTripSerialize(ThriftType.DOUBLE, 42.42d);
+        testRoundTripSerialize(ThriftType.FLOAT, 58.7f);
         testRoundTripSerialize(ThriftType.STRING, "some string");
         testRoundTripSerialize(ThriftType.STRING, UTF8_TEST_STRING);
     }

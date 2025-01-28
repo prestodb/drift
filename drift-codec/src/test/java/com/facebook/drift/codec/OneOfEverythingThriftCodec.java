@@ -62,6 +62,7 @@ public class OneOfEverythingThriftCodec
         BonkField aStruct = null;
         Fruit aEnum = null;
         UnionField aUnion = null;
+        float aFloat = 0;
 
         reader.readStructBegin();
 
@@ -97,6 +98,9 @@ public class OneOfEverythingThriftCodec
                 case 60:
                     aUnion = reader.readStructField(aUnionCodec);
                     break;
+                case 80:
+                    aFloat = reader.readFloatField();
+                    break;
                 default:
                     reader.skipFieldData();
             }
@@ -114,6 +118,7 @@ public class OneOfEverythingThriftCodec
         oneOfEverything.aStruct = aStruct;
         oneOfEverything.aEnum = aEnum;
         oneOfEverything.aUnion = aUnion;
+        oneOfEverything.aFloat = aFloat;
 
         return oneOfEverything;
     }
@@ -135,6 +140,7 @@ public class OneOfEverythingThriftCodec
         writer.writeStructField("aStruct", (short) 8, aStructCodec, oneOfEverything.aStruct);
         writer.writeEnumField("aEnum", (short) 9, aFruitCodec, oneOfEverything.aEnum);
         writer.writeStructField("aUnion", (short) 61, aUnionCodec, oneOfEverything.aUnion);
+        writer.writeFloatField("aFloat", (short) 80, oneOfEverything.aFloat);
         writer.writeStructEnd();
     }
 }

@@ -175,6 +175,19 @@ public final class OneOfEverything
     @ThriftField(74)
     public Map<String, UnionField> aUnionValueMap;
 
+    @ThriftField(80)
+    public float aFloat;
+    @ThriftField(81)
+    public Set<Float> aFloatSet;
+    @ThriftField(82)
+    public List<Float> aFloatList;
+    @ThriftField(83)
+    public Map<String, Float> aFloatValueMap;
+    @ThriftField(84)
+    public Map<Float, String> aFloatKeyMap;
+    @ThriftField(85)
+    public Optional<Float> aFloatOptional = Optional.empty();
+
     @ThriftField(100)
     public Set<List<Map<String, BonkField>>> aSetOfListsOfMaps;
     @ThriftField(101)
@@ -196,6 +209,7 @@ public final class OneOfEverything
                 aInt == that.aInt &&
                 aLong == that.aLong &&
                 Double.compare(that.aDouble, aDouble) == 0 &&
+                Float.compare(that.aFloat, aFloat) == 0 &&
                 Objects.equals(aString, that.aString) &&
                 Objects.equals(aStruct, that.aStruct) &&
                 aEnum == that.aEnum &&
@@ -206,6 +220,7 @@ public final class OneOfEverything
                 Objects.equals(aIntegerSet, that.aIntegerSet) &&
                 Objects.equals(aLongSet, that.aLongSet) &&
                 Objects.equals(aDoubleSet, that.aDoubleSet) &&
+                Objects.equals(aFloatSet, that.aFloatSet) &&
                 Objects.equals(aStringSet, that.aStringSet) &&
                 Objects.equals(aStructSet, that.aStructSet) &&
                 Objects.equals(aEnumSet, that.aEnumSet) &&
@@ -216,6 +231,7 @@ public final class OneOfEverything
                 Objects.equals(aIntegerList, that.aIntegerList) &&
                 Objects.equals(aLongList, that.aLongList) &&
                 Objects.equals(aDoubleList, that.aDoubleList) &&
+                Objects.equals(aFloatList, that.aFloatList) &&
                 Objects.equals(aStringList, that.aStringList) &&
                 Objects.equals(aStructList, that.aStructList) &&
                 Objects.equals(aEnumList, that.aEnumList) &&
@@ -226,6 +242,7 @@ public final class OneOfEverything
                 Objects.equals(aIntegerValueMap, that.aIntegerValueMap) &&
                 Objects.equals(aLongValueMap, that.aLongValueMap) &&
                 Objects.equals(aDoubleValueMap, that.aDoubleValueMap) &&
+                Objects.equals(aFloatValueMap, that.aFloatValueMap) &&
                 Objects.equals(aStringValueMap, that.aStringValueMap) &&
                 Objects.equals(aStructValueMap, that.aStructValueMap) &&
                 Objects.equals(aEnumValueMap, that.aEnumValueMap) &&
@@ -236,6 +253,7 @@ public final class OneOfEverything
                 Objects.equals(aIntegerKeyMap, that.aIntegerKeyMap) &&
                 Objects.equals(aLongKeyMap, that.aLongKeyMap) &&
                 Objects.equals(aDoubleKeyMap, that.aDoubleKeyMap) &&
+                Objects.equals(aFloatKeyMap, that.aFloatKeyMap) &&
                 Objects.equals(aStringKeyMap, that.aStringKeyMap) &&
                 Objects.equals(aStructKeyMap, that.aStructKeyMap) &&
                 Objects.equals(aEnumKeyMap, that.aEnumKeyMap) &&
@@ -246,6 +264,7 @@ public final class OneOfEverything
                 Objects.equals(aIntegerOptional, that.aIntegerOptional) &&
                 Objects.equals(aLongOptional, that.aLongOptional) &&
                 Objects.equals(aDoubleOptional, that.aDoubleOptional) &&
+                Objects.equals(aFloatOptional, that.aFloatOptional) &&
                 Objects.equals(aStringOptional, that.aStringOptional) &&
                 Objects.equals(aStructOptional, that.aStructOptional) &&
                 Objects.equals(aEnumOptional, that.aEnumOptional) &&
@@ -272,6 +291,7 @@ public final class OneOfEverything
                 aInt,
                 aLong,
                 aDouble,
+                aFloat,
                 aString,
                 aStruct,
                 aEnum,
@@ -282,6 +302,7 @@ public final class OneOfEverything
                 aIntegerSet,
                 aLongSet,
                 aDoubleSet,
+                aFloatSet,
                 aStringSet,
                 aStructSet,
                 aEnumSet,
@@ -292,6 +313,7 @@ public final class OneOfEverything
                 aIntegerList,
                 aLongList,
                 aDoubleList,
+                aFloatList,
                 aStringList,
                 aStructList,
                 aEnumList,
@@ -302,6 +324,7 @@ public final class OneOfEverything
                 aIntegerValueMap,
                 aLongValueMap,
                 aDoubleValueMap,
+                aFloatValueMap,
                 aStringValueMap,
                 aStructValueMap,
                 aEnumValueMap,
@@ -312,6 +335,7 @@ public final class OneOfEverything
                 aIntegerKeyMap,
                 aLongKeyMap,
                 aDoubleKeyMap,
+                aFloatKeyMap,
                 aStringKeyMap,
                 aStructKeyMap,
                 aEnumKeyMap,
@@ -322,6 +346,7 @@ public final class OneOfEverything
                 aIntegerOptional,
                 aLongOptional,
                 aDoubleOptional,
+                aFloatOptional,
                 aStringOptional,
                 aStructOptional,
                 aEnumOptional,
@@ -348,6 +373,7 @@ public final class OneOfEverything
                 .add("aInt", aInt)
                 .add("aLong", aLong)
                 .add("aDouble", aDouble)
+                .add("aFloat", aFloat)
                 .add("aString", aString)
                 .add("aStruct", aStruct)
                 .add("aEnum", aEnum)
@@ -358,6 +384,7 @@ public final class OneOfEverything
                 .add("aIntegerSet", aIntegerSet)
                 .add("aLongSet", aLongSet)
                 .add("aDoubleSet", aDoubleSet)
+                .add("aFloatSet", aFloatSet)
                 .add("aStringSet", aStringSet)
                 .add("aStructSet", aStructSet)
                 .add("aEnumSet", aEnumSet)
@@ -368,6 +395,7 @@ public final class OneOfEverything
                 .add("aIntegerList", aIntegerList)
                 .add("aLongList", aLongList)
                 .add("aDoubleList", aDoubleList)
+                .add("aFloatList", aFloatList)
                 .add("aStringList", aStringList)
                 .add("aStructList", aStructList)
                 .add("aEnumList", aEnumList)
@@ -378,6 +406,7 @@ public final class OneOfEverything
                 .add("aIntegerValueMap", aIntegerValueMap)
                 .add("aLongValueMap", aLongValueMap)
                 .add("aDoubleValueMap", aDoubleValueMap)
+                .add("aFloatValueMap", aFloatValueMap)
                 .add("aStringValueMap", aStringValueMap)
                 .add("aStructValueMap", aStructValueMap)
                 .add("aEnumValueMap", aEnumValueMap)
@@ -388,6 +417,7 @@ public final class OneOfEverything
                 .add("aIntegerKeyMap", aIntegerKeyMap)
                 .add("aLongKeyMap", aLongKeyMap)
                 .add("aDoubleKeyMap", aDoubleKeyMap)
+                .add("aFloatKeyMap", aFloatKeyMap)
                 .add("aStringKeyMap", aStringKeyMap)
                 .add("aStructKeyMap", aStructKeyMap)
                 .add("aEnumKeyMap", aEnumKeyMap)
@@ -398,6 +428,7 @@ public final class OneOfEverything
                 .add("aIntegerOptional", aIntegerOptional)
                 .add("aLongOptional", aLongOptional)
                 .add("aDoubleOptional", aDoubleOptional)
+                .add("aFloatOptional", aFloatOptional)
                 .add("aStringOptional", aStringOptional)
                 .add("aStructOptional", aStructOptional)
                 .add("aEnumOptional", aEnumOptional)

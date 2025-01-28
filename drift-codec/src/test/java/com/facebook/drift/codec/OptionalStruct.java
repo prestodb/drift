@@ -47,6 +47,8 @@ public class OptionalStruct
     private final OptionalInt aOptionalInt;
     private final OptionalLong aOptionalLong;
 
+    private final Optional<Float> aFloatOptional;
+
     private final Optional<List<Boolean>> aListBooleanOptional;
     private final Optional<List<Byte>> aListByteOptional;
     private final Optional<List<Short>> aListShortOptional;
@@ -57,6 +59,7 @@ public class OptionalStruct
     private final Optional<List<BonkField>> aListStructOptional;
     private final Optional<List<Fruit>> aListEnumOptional;
     private final Optional<List<Letter>> aListCustomEnumOptional;
+    private final Optional<List<Float>> aListFloatOptional;
 
     public OptionalStruct()
     {
@@ -75,6 +78,8 @@ public class OptionalStruct
         aOptionalInt = OptionalInt.empty();
         aOptionalLong = OptionalLong.empty();
 
+        aFloatOptional = Optional.empty();
+
         aListBooleanOptional = Optional.empty();
         aListByteOptional = Optional.empty();
         aListShortOptional = Optional.empty();
@@ -85,6 +90,7 @@ public class OptionalStruct
         aListStructOptional = Optional.empty();
         aListEnumOptional = Optional.empty();
         aListCustomEnumOptional = Optional.empty();
+        aListFloatOptional = Optional.empty();
     }
 
     @ThriftConstructor
@@ -104,6 +110,8 @@ public class OptionalStruct
             OptionalInt aOptionalInt,
             OptionalLong aOptionalLong,
 
+            Optional<Float> aFloatOptional,
+
             Optional<List<Boolean>> aListBooleanOptional,
             Optional<List<Byte>> aListByteOptional,
             Optional<List<Short>> aListShortOptional,
@@ -113,7 +121,8 @@ public class OptionalStruct
             Optional<List<String>> aListStringOptional,
             Optional<List<BonkField>> aListStructOptional,
             Optional<List<Fruit>> aListEnumOptional,
-            Optional<List<Letter>> aListCustomEnumOptional)
+            Optional<List<Letter>> aListCustomEnumOptional,
+            Optional<List<Float>> aListFloatOptional)
     {
         this.aBooleanOptional = requireNonNull(aBooleanOptional, "aBooleanOptional is null");
         this.aByteOptional = requireNonNull(aByteOptional, "aByteOptional is null");
@@ -130,6 +139,8 @@ public class OptionalStruct
         this.aOptionalInt = requireNonNull(aOptionalInt, "aOptionalInt is null");
         this.aOptionalLong = requireNonNull(aOptionalLong, "aOptionalLong is null");
 
+        this.aFloatOptional = requireNonNull(aFloatOptional, "aFloatOptional is null");
+
         this.aListBooleanOptional = requireNonNull(aListBooleanOptional, "aListBooleanOptional is null");
         this.aListByteOptional = requireNonNull(aListByteOptional, "aListByteOptional is null");
         this.aListShortOptional = requireNonNull(aListShortOptional, "aListShortOptional is null");
@@ -140,6 +151,7 @@ public class OptionalStruct
         this.aListStructOptional = requireNonNull(aListStructOptional, "aListStructOptional is null");
         this.aListEnumOptional = requireNonNull(aListEnumOptional, "aListEnumOptional is null");
         this.aListCustomEnumOptional = requireNonNull(aListCustomEnumOptional, "aListCustomEnumOptional is null");
+        this.aListFloatOptional = requireNonNull(aListFloatOptional, "aListFloatOptional is null");
     }
 
     @ThriftField(10)
@@ -220,6 +232,12 @@ public class OptionalStruct
         return aOptionalLong;
     }
 
+    @ThriftField(23)
+    public Optional<Float> getAFloatOptional()
+    {
+        return aFloatOptional;
+    }
+
     @ThriftField(110)
     public Optional<List<Boolean>> getAListBooleanOptional()
     {
@@ -280,6 +298,12 @@ public class OptionalStruct
         return aListCustomEnumOptional;
     }
 
+    @ThriftField(120)
+    public Optional<List<Float>> getAListFloatOptional()
+    {
+        return aListFloatOptional;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -296,6 +320,7 @@ public class OptionalStruct
                 Objects.equals(aIntegerOptional, that.aIntegerOptional) &&
                 Objects.equals(aLongOptional, that.aLongOptional) &&
                 Objects.equals(aDoubleOptional, that.aDoubleOptional) &&
+                Objects.equals(aFloatOptional, that.aFloatOptional) &&
                 Objects.equals(aStringOptional, that.aStringOptional) &&
                 Objects.equals(aStructOptional, that.aStructOptional) &&
                 Objects.equals(aEnumOptional, that.aEnumOptional) &&
@@ -309,6 +334,7 @@ public class OptionalStruct
                 Objects.equals(aListIntegerOptional, that.aListIntegerOptional) &&
                 Objects.equals(aListLongOptional, that.aListLongOptional) &&
                 Objects.equals(aListDoubleOptional, that.aListDoubleOptional) &&
+                Objects.equals(aListFloatOptional, that.aListFloatOptional) &&
                 Objects.equals(aListStringOptional, that.aListStringOptional) &&
                 Objects.equals(aListStructOptional, that.aListStructOptional) &&
                 Objects.equals(aListEnumOptional, that.aListEnumOptional) &&
@@ -325,6 +351,7 @@ public class OptionalStruct
                 aIntegerOptional,
                 aLongOptional,
                 aDoubleOptional,
+                aFloatOptional,
                 aStringOptional,
                 aStructOptional,
                 aEnumOptional,
@@ -338,6 +365,7 @@ public class OptionalStruct
                 aListIntegerOptional,
                 aListLongOptional,
                 aListDoubleOptional,
+                aListFloatOptional,
                 aListStringOptional,
                 aListStructOptional,
                 aListEnumOptional,
@@ -354,6 +382,7 @@ public class OptionalStruct
                 .add("aIntegerOptional", aIntegerOptional)
                 .add("aLongOptional", aLongOptional)
                 .add("aDoubleOptional", aDoubleOptional)
+                .add("aFloatOptional", aFloatOptional)
                 .add("aStringOptional", aStringOptional)
                 .add("aStructOptional", aStructOptional)
                 .add("aEnumOptional", aEnumOptional)
@@ -367,6 +396,7 @@ public class OptionalStruct
                 .add("aListIntegerOptional", aListIntegerOptional)
                 .add("aListLongOptional", aListLongOptional)
                 .add("aListDoubleOptional", aListDoubleOptional)
+                .add("aListFloatOptional", aListFloatOptional)
                 .add("aListStringOptional", aListStringOptional)
                 .add("aListStructOptional", aListStructOptional)
                 .add("aListEnumOptional", aListEnumOptional)

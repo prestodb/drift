@@ -101,6 +101,7 @@ import static com.facebook.drift.codec.ThriftProtocolType.BOOL;
 import static com.facebook.drift.codec.ThriftProtocolType.BYTE;
 import static com.facebook.drift.codec.ThriftProtocolType.DOUBLE;
 import static com.facebook.drift.codec.ThriftProtocolType.ENUM;
+import static com.facebook.drift.codec.ThriftProtocolType.FLOAT;
 import static com.facebook.drift.codec.ThriftProtocolType.I16;
 import static com.facebook.drift.codec.ThriftProtocolType.I32;
 import static com.facebook.drift.codec.ThriftProtocolType.I64;
@@ -1108,6 +1109,7 @@ public class ThriftCodecByteCodeGenerator<T>
             case BOOL:
             case BYTE:
             case DOUBLE:
+            case FLOAT:
             case I16:
             case I32:
             case I64:
@@ -1157,6 +1159,7 @@ public class ThriftCodecByteCodeGenerator<T>
             writeBuilder.put(BOOL, ProtocolWriter.class.getMethod("writeBoolField", String.class, short.class, boolean.class));
             writeBuilder.put(BYTE, ProtocolWriter.class.getMethod("writeByteField", String.class, short.class, byte.class));
             writeBuilder.put(DOUBLE, ProtocolWriter.class.getMethod("writeDoubleField", String.class, short.class, double.class));
+            writeBuilder.put(FLOAT, ProtocolWriter.class.getMethod("writeFloatField", String.class, short.class, float.class));
             writeBuilder.put(I16, ProtocolWriter.class.getMethod("writeI16Field", String.class, short.class, short.class));
             writeBuilder.put(I32, ProtocolWriter.class.getMethod("writeI32Field", String.class, short.class, int.class));
             writeBuilder.put(I64, ProtocolWriter.class.getMethod("writeI64Field", String.class, short.class, long.class));
@@ -1171,6 +1174,7 @@ public class ThriftCodecByteCodeGenerator<T>
             readBuilder.put(BOOL, ProtocolReader.class.getMethod("readBoolField"));
             readBuilder.put(BYTE, ProtocolReader.class.getMethod("readByteField"));
             readBuilder.put(DOUBLE, ProtocolReader.class.getMethod("readDoubleField"));
+            readBuilder.put(FLOAT, ProtocolReader.class.getMethod("readFloatField"));
             readBuilder.put(I16, ProtocolReader.class.getMethod("readI16Field"));
             readBuilder.put(I32, ProtocolReader.class.getMethod("readI32Field"));
             readBuilder.put(I64, ProtocolReader.class.getMethod("readI64Field"));
@@ -1197,12 +1201,14 @@ public class ThriftCodecByteCodeGenerator<T>
             arrayWriteBuilder.put(int[].class, ProtocolWriter.class.getMethod("writeI32ArrayField", String.class, short.class, int[].class));
             arrayWriteBuilder.put(long[].class, ProtocolWriter.class.getMethod("writeI64ArrayField", String.class, short.class, long[].class));
             arrayWriteBuilder.put(double[].class, ProtocolWriter.class.getMethod("writeDoubleArrayField", String.class, short.class, double[].class));
+            arrayWriteBuilder.put(float[].class, ProtocolWriter.class.getMethod("writeFloatArrayField", String.class, short.class, float[].class));
 
             arrayReadBuilder.put(boolean[].class, ProtocolReader.class.getMethod("readBoolArrayField"));
             arrayReadBuilder.put(short[].class, ProtocolReader.class.getMethod("readI16ArrayField"));
             arrayReadBuilder.put(int[].class, ProtocolReader.class.getMethod("readI32ArrayField"));
             arrayReadBuilder.put(long[].class, ProtocolReader.class.getMethod("readI64ArrayField"));
             arrayReadBuilder.put(double[].class, ProtocolReader.class.getMethod("readDoubleArrayField"));
+            arrayReadBuilder.put(float[].class, ProtocolReader.class.getMethod("readFloatArrayField"));
 
             // byte[] is encoded as BINARY which should use the normal rules above, but it
             // simpler to add explicit handling here

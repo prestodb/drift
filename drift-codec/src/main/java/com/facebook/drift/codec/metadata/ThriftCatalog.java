@@ -59,6 +59,7 @@ import static com.facebook.drift.codec.metadata.ThriftType.BINARY;
 import static com.facebook.drift.codec.metadata.ThriftType.BOOL;
 import static com.facebook.drift.codec.metadata.ThriftType.BYTE;
 import static com.facebook.drift.codec.metadata.ThriftType.DOUBLE;
+import static com.facebook.drift.codec.metadata.ThriftType.FLOAT;
 import static com.facebook.drift.codec.metadata.ThriftType.I16;
 import static com.facebook.drift.codec.metadata.ThriftType.I32;
 import static com.facebook.drift.codec.metadata.ThriftType.I64;
@@ -282,6 +283,9 @@ public final class ThriftCatalog
         if (double.class == rawType) {
             return DOUBLE;
         }
+        if (float.class == rawType) {
+            return FLOAT;
+        }
         if (String.class == rawType) {
             return STRING;
         }
@@ -462,6 +466,9 @@ public final class ThriftCatalog
         if (double.class == rawType) {
             return ThriftProtocolType.DOUBLE;
         }
+        if (float.class == rawType) {
+            return ThriftProtocolType.FLOAT;
+        }
         if (String.class == rawType) {
             return ThriftProtocolType.STRING;
         }
@@ -529,7 +536,8 @@ public final class ThriftCatalog
                 short.class == componentType ||
                 int.class == componentType ||
                 long.class == componentType ||
-                double.class == componentType;
+                double.class == componentType ||
+                float.class == componentType;
     }
 
     /**

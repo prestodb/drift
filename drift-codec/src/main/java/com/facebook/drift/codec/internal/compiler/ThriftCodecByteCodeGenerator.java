@@ -1102,7 +1102,10 @@ public class ThriftCodecByteCodeGenerator<T>
         }
 
         if (ReflectionHelper.isOptional(typeRef.getJavaType())) {
-            return type(Optional.class, toParameterizedType(typeRef.get().getValueTypeReference()));
+            ThriftType valueType = typeRef.get().getValueTypeReference().get();
+            if (!valueType.equals(ThriftType.FLOAT)) {
+                return type(Optional.class, toParameterizedType(typeRef.get().getValueTypeReference()));
+            }
         }
 
         switch (typeRef.getProtocolType()) {

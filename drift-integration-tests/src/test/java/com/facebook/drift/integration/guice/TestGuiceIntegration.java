@@ -20,7 +20,7 @@ import com.facebook.airlift.bootstrap.LifeCycleManager;
 import com.facebook.drift.TApplicationException;
 import com.facebook.drift.TException;
 import com.facebook.drift.client.ExceptionClassification;
-import com.facebook.drift.client.RetriesFailedException;
+import com.facebook.drift.client.exceptions.DriftRetriesFailedException;
 import com.facebook.drift.integration.guice.EchoService.EmptyOptionalException;
 import com.facebook.drift.integration.guice.EchoService.NullValueException;
 import com.facebook.drift.integration.scribe.drift.DriftLogEntry;
@@ -250,7 +250,7 @@ public class TestGuiceIntegration
             assertFalse(e.isRetryable());
             assertEquals(e.getSuppressed().length, 1);
             Throwable t = e.getSuppressed()[0];
-            assertThat(t).isInstanceOf(RetriesFailedException.class)
+            assertThat(t).isInstanceOf(DriftRetriesFailedException.class)
                     .hasMessageContaining("Non-retryable exception")
                     .hasMessageContaining("invocationAttempts: 1,");
         }
@@ -264,7 +264,7 @@ public class TestGuiceIntegration
             assertTrue(e.isRetryable());
             assertEquals(e.getSuppressed().length, 1);
             Throwable t = e.getSuppressed()[0];
-            assertThat(t).isInstanceOf(RetriesFailedException.class)
+            assertThat(t).isInstanceOf(DriftRetriesFailedException.class)
                     .hasMessageContaining("Max retry attempts (5) exceeded")
                     .hasMessageContaining("invocationAttempts: 6,");
         }
@@ -281,7 +281,7 @@ public class TestGuiceIntegration
                     .hasMessageMatching("Frame size .+ exceeded max size .+");
             assertEquals(e.getSuppressed().length, 1);
             Throwable t = e.getSuppressed()[0];
-            assertThat(t).isInstanceOf(RetriesFailedException.class)
+            assertThat(t).isInstanceOf(DriftRetriesFailedException.class)
                     .hasMessageContaining("Non-retryable exception")
                     .hasMessageContaining("invocationAttempts: 1,");
         }

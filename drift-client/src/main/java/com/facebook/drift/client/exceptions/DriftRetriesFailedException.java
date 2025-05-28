@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.drift.client;
+package com.facebook.drift.client.exceptions;
 
 import com.facebook.drift.transport.client.Address;
 import com.google.common.collect.ImmutableSet;
@@ -24,7 +24,7 @@ import java.util.Set;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
-public class RetriesFailedException
+public class DriftRetriesFailedException
         extends Exception
 {
     private final int invocationAttempts;
@@ -33,7 +33,7 @@ public class RetriesFailedException
     private final int overloadedRejects;
     private final Set<? extends Address> attemptedAddresses;
 
-    public RetriesFailedException(
+    DriftRetriesFailedException(
             String reason,
             int invocationAttempts,
             Duration retryTime,

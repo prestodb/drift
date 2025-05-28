@@ -21,6 +21,7 @@ import com.facebook.drift.annotations.ThriftStruct;
 import com.facebook.drift.annotations.ThriftUnion;
 import com.facebook.drift.codec.ThriftProtocolType;
 import com.facebook.drift.codec.internal.builtin.OptionalDoubleThriftCodec;
+import com.facebook.drift.codec.internal.builtin.OptionalFloatThriftCodec;
 import com.facebook.drift.codec.internal.builtin.OptionalIntThriftCodec;
 import com.facebook.drift.codec.internal.builtin.OptionalLongThriftCodec;
 import com.facebook.drift.codec.internal.coercion.DefaultJavaCoercions;
@@ -116,6 +117,7 @@ public final class ThriftCatalog
         this.monitor = monitor;
         addDefaultCoercions(DefaultJavaCoercions.class);
         addThriftType(new OptionalDoubleThriftCodec().getType());
+        addThriftType(new OptionalFloatThriftCodec().getType());
         addThriftType(new OptionalIntThriftCodec().getType());
         addThriftType(new OptionalLongThriftCodec().getType());
     }

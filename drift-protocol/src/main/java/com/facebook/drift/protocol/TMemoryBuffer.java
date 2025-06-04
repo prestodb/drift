@@ -15,44 +15,70 @@
  */
 package com.facebook.drift.protocol;
 
-import static java.lang.Math.max;
+import java.io.UnsupportedEncodingException;
 
 public class TMemoryBuffer
         implements TTransport
 {
-    private byte[] data;
-    private int head;
-    private int tail;
+    // The contents of the buffer
+    private TByteArrayOutputStream data;
 
-    public TMemoryBuffer(int initialSize)
+    // Position to read next byte from
+    private int position;
+
+    public TMemoryBuffer(int size)
     {
-        data = new byte[max(initialSize, 16)];
+        reset(size);
     }
 
     @Override
     public void read(byte[] buf, int off, int len)
             throws TTransportException
     {
-        if (head - tail < len) {
-            throw new TTransportException("Too few bytes in buffer");
+        byte[] src = data.get();
+        int amtToRead = (len > data.len() - position ? data.len() - position : len);
+        if (amtToRead > 0) {
+            System.arraycopy(src, position, buf, off, amtToRead);
+            position += amtToRead;
         }
-        System.arraycopy(data, tail, buf, off, len);
-        tail += len;
     }
 
     @Override
     public void write(byte[] buf, int off, int len)
     {
-        int available = data.length - head;
-        if (available < len) {
-            int need = len - available - tail;
-            byte[] temp = new byte[max(data.length * 2, need)];
-            System.arraycopy(data, tail, temp, 0, head - tail);
-            data = temp;
-            head -= tail;
-            tail = 0;
-        }
-        System.arraycopy(buf, off, data, head, len);
-        head += len;
+        data.write(buf, off, len);
+    }
+
+    /**
+     * Output the contents of the memory buffer as a String, using the supplied encoding
+     *
+     * @param enc the encoding to use
+     * @return the contents of the memory buffer as a String
+     */
+    public String toString(String enc)
+            throws UnsupportedEncodingException
+    {
+        return data.toString(enc);
+    }
+
+    public int length()
+    {
+        return data.len();
+    }
+
+    public void reset(int size)
+    {
+        data = new TByteArrayOutputStream(size);
+        position = 0;
+    }
+
+    public byte[] getBytes()
+    {
+        return data.get();
+    }
+
+    public int getArrayPos()
+    {
+        return position;
     }
 }

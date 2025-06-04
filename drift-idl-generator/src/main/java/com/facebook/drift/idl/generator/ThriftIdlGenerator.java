@@ -162,8 +162,8 @@ public class ThriftIdlGenerator
                     throw new ThriftIdlGeneratorException("Method annotated with @CodecThriftType must be static: " + customCodecClassName + "#" + method.getName());
                 }
 
-                if (method.getParameterCount() != 0) {
-                    throw new ThriftIdlGeneratorException("Method annotated with @CodecThriftType must have no parameters: " + customCodecClassName + "#" + method.getName());
+                if (method.getParameterCount() != 1 || method.getParameterTypes()[0] != ThriftCatalog.class) {
+                    throw new ThriftIdlGeneratorException("Method annotated with @CodecThriftType must have only 1 parameter of ThriftCatalog type: " + customCodecClassName + "#" + method.getName());
                 }
 
                 if (!ThriftType.class.isAssignableFrom(method.getReturnType())) {
@@ -171,7 +171,7 @@ public class ThriftIdlGenerator
                 }
 
                 try {
-                    thriftType = (ThriftType) method.invoke(null);
+                    thriftType = (ThriftType) method.invoke(null, this.catalog);
                     if (thriftType == null) {
                         throw new ThriftIdlGeneratorException("Method annotated with @CodecThriftType returns null: " + customCodecClassName + "#" + method.getName());
                     }

@@ -17,6 +17,7 @@ package com.facebook.drift.codec.internal.builtin;
 
 import com.facebook.drift.codec.CodecThriftType;
 import com.facebook.drift.codec.ThriftCodec;
+import com.facebook.drift.codec.metadata.ThriftCatalog;
 import com.facebook.drift.codec.metadata.ThriftType;
 import com.facebook.drift.protocol.TProtocolReader;
 import com.facebook.drift.protocol.TProtocolWriter;
@@ -34,7 +35,7 @@ public class OptionalLongThriftCodec
     private static final ThriftType THRIFT_TYPE = new ThriftType(ThriftType.I64, OptionalLong.class, OptionalLong.empty());
 
     @CodecThriftType
-    public static ThriftType getThriftType()
+    public static ThriftType getThriftType(ThriftCatalog catalog)
     {
         return THRIFT_TYPE;
     }

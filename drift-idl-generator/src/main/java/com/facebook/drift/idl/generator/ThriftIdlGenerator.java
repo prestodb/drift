@@ -152,7 +152,7 @@ public class ThriftIdlGenerator
 
         // Look for a static method annotated with @CodecThriftType
         ThriftType thriftType = null;
-        for (Method method : codecClass.getDeclaredMethods()) {
+        for (Method method : codecClass.getMethods()) {
             if (method.isAnnotationPresent(CodecThriftType.class)) {
                 if (!Modifier.isPublic(method.getModifiers())) {
                     throw new ThriftIdlGeneratorException("Method annotated with @CodecThriftType must be public: " + customCodecClassName + "#" + method.getName());

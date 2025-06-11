@@ -15,6 +15,7 @@
  */
 package com.facebook.drift.codec.utils;
 
+import com.facebook.drift.codec.CodecThriftType;
 import com.facebook.drift.codec.ThriftCodec;
 import com.facebook.drift.codec.internal.coercion.FromThrift;
 import com.facebook.drift.codec.internal.coercion.ToThrift;
@@ -33,24 +34,32 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * This codec will encode UUIDs into the format specified in RFC 4122:
- *
+ * <p>
  * https://www.ietf.org/rfc/rfc4122.txt
- *
+ * <p>
  * Likewise, it presumes the input is of this format.
  */
 public class UuidToLeachSalzBinaryEncodingThriftCodec
         implements ThriftCodec<UUID>
 {
+    private static final ThriftType THRIFT_TYPE = new ThriftType(ThriftType.BINARY, UUID.class);
+
     @Inject
     public UuidToLeachSalzBinaryEncodingThriftCodec(ThriftCatalog thriftCatalog)
     {
         thriftCatalog.addDefaultCoercions(getClass());
     }
 
+    @CodecThriftType
+    public static ThriftType getThriftType()
+    {
+        return THRIFT_TYPE;
+    }
+
     @Override
     public ThriftType getType()
     {
-        return new ThriftType(ThriftType.BINARY, UUID.class);
+        return THRIFT_TYPE;
     }
 
     @Override

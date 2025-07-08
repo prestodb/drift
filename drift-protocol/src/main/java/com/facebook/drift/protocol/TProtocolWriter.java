@@ -16,8 +16,10 @@
 package com.facebook.drift.protocol;
 
 import com.facebook.drift.TException;
+import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 public interface TProtocolWriter
 {
@@ -86,4 +88,27 @@ public interface TProtocolWriter
 
     void writeBinary(ByteBuffer value)
             throws TException;
+
+    default void writeBinary(ByteBuf value)
+            throws TException
+    {
+        if (value.hasArray() && value.arrayOffset() == 0 && value.readableBytes() == value.array().length) {
+            writeBinary(ByteBuffer.wrap(value.array()));
+        }
+        else {
+            ByteBuffer byteBuffer = ByteBuffer.allocate(value.readableBytes());
+            value.getBytes(value.readerIndex(), byteBuffer);
+            byteBuffer.flip();
+            writeBinary(byteBuffer);
+        }
+    }
+
+    default void writeBinary(List<ByteBuf> buffers)
+            throws TException
+    {
+        if (buffers == null || buffers.isEmpty()) {
+            throw new TException("buffer list can not be null or empty");
+        }
+        writeBinary(buffers.get(0));
+    }
 }

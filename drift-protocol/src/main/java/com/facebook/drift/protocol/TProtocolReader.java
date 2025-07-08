@@ -16,8 +16,12 @@
 package com.facebook.drift.protocol;
 
 import com.facebook.drift.TException;
+import com.google.common.collect.ImmutableList;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 public interface TProtocolReader
 {
@@ -83,6 +87,28 @@ public interface TProtocolReader
 
     ByteBuffer readBinary()
             throws TException;
+
+    default List<ByteBuf> readBinaryAsByteBufList()
+            throws TException
+    {
+        ByteBuf buf = readBinaryAsByteBuf();
+        return ImmutableList.of(buf);
+    }
+
+    default ByteBuf readBinaryAsByteBuf()
+            throws TException
+
+    {
+        ByteBuffer buffer = readBinary();
+        if (buffer.hasArray()) {
+            return Unpooled.wrappedBuffer(buffer.array(), buffer.arrayOffset() + buffer.position(), buffer.remaining());
+        }
+        else {
+            ByteBuf byteBuf = Unpooled.buffer(buffer.remaining());
+            byteBuf.writeBytes(buffer);
+            return byteBuf;
+        }
+    }
 
     int readBinary(byte[] buf, int offset)
             throws TException;

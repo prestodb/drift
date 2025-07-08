@@ -15,6 +15,8 @@
  */
 package com.facebook.drift.protocol;
 
+import io.netty.buffer.ByteBuf;
+
 public interface TTransport
 {
     void read(byte[] buf, int off, int len)
@@ -27,5 +29,18 @@ public interface TTransport
             throws TTransportException
     {
         write(buf, 0, buf.length);
+    }
+
+    default void write(ByteBuf buffer)
+            throws TTransportException
+    {
+        if (buffer.hasArray()) {
+            write(buffer.array(), buffer.arrayOffset() + buffer.readerIndex(), buffer.readableBytes());
+        }
+        else {
+            byte[] bytes = new byte[buffer.readableBytes()];
+            buffer.getBytes(buffer.readerIndex(), bytes);
+            write(bytes, 0, bytes.length);
+        }
     }
 }

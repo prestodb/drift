@@ -9,6 +9,7 @@
     </parent>
 
     <artifactId>drift-codec</artifactId>
+    <name>drift-codec</name>
     <description>Annotation based encoder and decoder for Thrift</description>
     <packaging>jar</packaging>
 

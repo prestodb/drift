@@ -9,6 +9,7 @@
     </parent>
 
     <artifactId>drift-idl-generator</artifactId>
+    <name>drift-idl-generator</name>
     <description>Generate Thrift IDL from Drift annotated classes</description>
     <packaging>jar</packaging>
 

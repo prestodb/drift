@@ -9,6 +9,7 @@
     </parent>
 
     <artifactId>drift-protocol</artifactId>
+    <name>drift-protocol</name>
     <description>Core classes for Drift</description>
     <packaging>jar</packaging>
 

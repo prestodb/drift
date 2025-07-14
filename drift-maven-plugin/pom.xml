@@ -9,6 +9,7 @@
     </parent>
 
     <artifactId>drift-maven-plugin</artifactId>
+    <name>drift-maven-plugin</name>
     <description>Maven plugin for Drift</description>
     <packaging>maven-plugin</packaging>
 

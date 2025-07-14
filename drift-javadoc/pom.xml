@@ -9,6 +9,7 @@
     </parent>
 
     <artifactId>drift-javadoc</artifactId>
+    <name>drift-javadoc</name>
     <description>Annotation processor to store the Javadoc of Drift classes</description>
     <packaging>jar</packaging>
 

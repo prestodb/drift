@@ -9,6 +9,7 @@
     </parent>
 
     <artifactId>drift-codec-utils</artifactId>
+    <name>drift-codec-utils</name>
     <description>Default codecs for common data structures</description>
     <packaging>jar</packaging>
 

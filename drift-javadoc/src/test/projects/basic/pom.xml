@@ -4,6 +4,7 @@
 
     <groupId>com.facebook.drift.its</groupId>
     <artifactId>basic</artifactId>
+    <name>basic</name>
     <version>1.0</version>
 
     <dependencies>

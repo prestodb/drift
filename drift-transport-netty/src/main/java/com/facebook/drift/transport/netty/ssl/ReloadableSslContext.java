@@ -25,6 +25,7 @@ import io.netty.handler.ssl.ApplicationProtocolConfig.SelectedListenerFailureBeh
 import io.netty.handler.ssl.ApplicationProtocolConfig.SelectorFailureBehavior;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -136,6 +137,7 @@ public final class ReloadableSslContext
                 // it should respond with a no_application_protocol alert and fail the TLS handshake.
                 sslContextBuilder.applicationProtocolConfig(new ApplicationProtocolConfig(
                         Protocol.ALPN, SelectorFailureBehavior.FATAL_ALERT, SelectedListenerFailureBehavior.FATAL_ALERT, new String[] {"thrift"}));
+                sslContextBuilder.sslProvider(SslProvider.JDK);
                 sslContext.set(new SslContextHolder(sslContextBuilder.build()));
             }
         }
